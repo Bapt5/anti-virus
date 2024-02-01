@@ -1,12 +1,15 @@
 #include "resolution.h"
 
-enum Direction {
-    HAUT,
-    BAS,
-    GAUCHE,
-    DROITE
+enum Direction_e {
+    HAUT = 0,
+    BAS = 1,
+    GAUCHE = 2,
+    DROITE =3
 };
+typedef enum Direction_e Direction;
 
+// TODO: utiliser des tableaux dynamiques pour les listes ???
+// TODO: directions
 liste voisins_piece (jeu jeu_, int id_piece) {
     /*
     Paramètres:
@@ -79,30 +82,24 @@ liste voisins_piece (jeu jeu_, int id_piece) {
     return l;
 }
 
-liste position_accessible (jeu jeu_, int n, int id_pieces[n], Direction dir) {
+void position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, file* f, liste path) {
     /* 
     Paramètres:
         - jeu_: le jeu
         - n: le nombre de pièces à essayer de bouger
         - id_pieces: un tableau contenant les id des pièces à essayer de bouger
+        - dir: la direction dans laquelle on veut bouger les pièces
+        - f: la file dans laquelle on va ajouter les grilles accessibles
+        - path: le chemin menant à la grille actuelle
 
-    Retourne:
-        - une liste de jeu* contenant les grilles accessibles en bougeant les pièces
-          id_pieces[0], ..., id_pieces[n - 1]
+    Ajoute à f les grilles accessibles en bougeant les pièces
+        id_pieces[0], ..., id_pieces[n - 1] dans la direction dir
     */
 
     for (int i = 0; i < n; i += 1) {
         assert(id_pieces[i] >= 1 && id_pieces[i] <= jeu_.nb_pieces);
         assert(jeu_.pieces[id_pieces[i] - 1]->bougeable);
     }
-
-    liste l = creer_liste();
-
-    // position* positions_init = malloc(n * sizeof(position));
-
-    // for (int k = 0; k < n; k += 1) {
-    //     positions_init[k] = jeu_.pieces[id_pieces[k] - 1]->pos;
-    // }
 
     jeu* jeu_copie = copie_jeu(&jeu_);
 
@@ -122,121 +119,34 @@ liste position_accessible (jeu jeu_, int n, int id_pieces[n], Direction dir) {
         if (est_valide_jeu(*jeu_copie)) {
             jeu* jeu2 = copie_jeu(jeu_copie);
 
-            l = ajouter_tete_liste(jeu2, l);
+            enfiler(ajouter_tete_liste(jeu2, copie_liste(path, copie_jeu)), f);
         } else {
             break;
         }
 
     }
 
-    // on regarde si on peut aller en bas
-    // for (int i = 1; i < jeu_.taille; i += 1) {
-    //     for (int k = 0; k < n; k += 1) {
-    //         jeu_.pieces[id_pieces[k] - 1]->pos.i = positions_init[k].i + i;
-    //         jeu_.pieces[id_pieces[k] - 1]->pos.j = positions_init[k].j;
-    //     }
-
-    //     bool valide = true;
-    //     for (int k = 0; k < n; k += 1) {
-    //         if (!est_valide_jeu(jeu_)) {
-    //             valide = false;
-    //             break;
-    //         }
-    //     }
-
-    //     if (valide) {
-    //         jeu* jeu2 = copie_jeu(&jeu_);
-
-    //         l = ajouter_tete_liste(jeu2, l);
-    //     } else {
-    //         break;
-    //     }
-    // }
-
-    // // on regarde si on peut aller en haut
-    // for (int i = 1; i < jeu_.taille; i += 1) {
-    //     for (int k = 0; k < n; k += 1) {
-    //         jeu_.pieces[id_pieces[k] - 1]->pos.i = positions_init[k].i - i;
-    //         jeu_.pieces[id_pieces[k] - 1]->pos.j = positions_init[k].j;
-    //     }
-
-    //     bool valide = true;
-    //     for (int k = 0; k < n; k += 1) {
-    //         if (!est_valide_jeu(jeu_)) {
-    //             valide = false;
-    //             break;
-    //         }
-    //     }
-
-    //     if (valide) {
-    //         jeu* jeu2 = copie_jeu(&jeu_);
-
-    //         l = ajouter_tete_liste(jeu2, l);
-    //     } else {
-    //         break;
-    //     }
-    // }
-
-    // // on regarde si on peut aller à droite
-    // for (int j = 1; j < jeu_.taille; j += 1) {
-    //     for (int k = 0; k < n; k += 1) {
-    //         jeu_.pieces[id_pieces[k] - 1]->pos.i = positions_init[k].i;
-    //         jeu_.pieces[id_pieces[k] - 1]->pos.j = positions_init[k].j + j;
-    //     }
-
-    //     bool valide = true;
-    //     for (int k = 0; k < n; k += 1) {
-    //         if (!est_valide_jeu(jeu_)) {
-    //             valide = false;
-    //             break;
-    //         }
-    //     }
-
-    //     if (valide) {
-    //         jeu* jeu2 = copie_jeu(&jeu_);
-
-    //         l = ajouter_tete_liste(jeu2, l);
-    //     } else {
-    //         break;
-    //     }
-    // }
-
-    // // on regarde si on peut aller à gauche
-    // for (int j = 1; j < jeu_.taille; j += 1) {
-    //     for (int k = 0; k < n; k += 1) {
-    //         jeu_.pieces[id_pieces[k] - 1]->pos.i = positions_init[k].i;
-    //         jeu_.pieces[id_pieces[k] - 1]->pos.j = positions_init[k].j - j;
-    //     }
-
-    //     bool valide = true;
-    //     for (int k = 0; k < n; k += 1) {
-    //         if (!est_valide_jeu(jeu_)) {
-    //             valide = false;
-    //             break;
-    //         }
-    //     }
-
-    //     if (valide) {
-    //         jeu* jeu2 = copie_jeu(&jeu_);
-
-    //         l = ajouter_tete_liste(jeu2, l);
-    //     } else {
-    //         break;
-    //     }
-    // }
-
-    // for (int k = 0; k < n; k += 1) {
-    //     jeu_.pieces[id_pieces[k] - 1]->pos = positions_init[k];
-    // }
-
-    // free(positions_init);
-
     free_jeu(jeu_copie);
-
-    return l;
 }
 
-void bouge_voisins (jeu* jeu_, int id_piece, file* f, liste path) {
+void position_accessible (jeu jeu_, int n, int id_pieces[n], file* f, liste path) {
+    /*
+    Paramètres: 
+        - jeu_: le jeu
+        - n: le nombre de pièces à essayer de bouger
+        - id_pieces: un tableau contenant les id des pièces à essayer de bouger
+        - f: la file dans laquelle on va ajouter les grilles accessibles
+        - path: le chemin menant à la grille actuelle
+    Ajoute à f les grilles accessibles en bougeant les pièces id_pieces[0], ..., id_pieces[n - 1]
+    */
+    
+    for (int dir = 0; dir < 4; dir += 1) {
+        position_accessible_dir(jeu_, n, id_pieces, dir, f, path);
+    }
+    
+}
+
+void bouge_voisins (jeu jeu_, int id_piece, file* f, liste path) {
     /*
     Paramètres:
         - jeu_: le jeu
@@ -247,10 +157,10 @@ void bouge_voisins (jeu* jeu_, int id_piece, file* f, liste path) {
     Ajoute à f les grilles accessibles en bougeant les voisins de la pièce id_piece
     */
 
-    liste voisins_l = voisins_piece(*jeu_, id_piece);
+    liste voisins_l = voisins_piece(jeu_, id_piece);
     int nb_voisins_bougeables = 0;
     for (liste l_i = voisins_l; !est_vide_liste(l_i); l_i = queue_liste(l_i)) {
-        if (jeu_->pieces[*(int*)tete_liste(l_i) - 1]->bougeable) {
+        if (jeu_.pieces[*(int*)tete_liste(l_i) - 1]->bougeable) {
             nb_voisins_bougeables += 1;
         }
     }
@@ -265,7 +175,7 @@ void bouge_voisins (jeu* jeu_, int id_piece, file* f, liste path) {
     int i = 0;
     for (liste l_i = voisins_l; !est_vide_liste(l_i); l_i = queue_liste(l_i)) {
         int* id_voisin = tete_liste(l_i);
-        if (jeu_->pieces[*id_voisin - 1]->bougeable) {
+        if (jeu_.pieces[*id_voisin - 1]->bougeable) {
             voisins[i] = *id_voisin;
             i += 1;
         }
@@ -289,14 +199,8 @@ void bouge_voisins (jeu* jeu_, int id_piece, file* f, liste path) {
             }
             id_pieces[k] = id_piece;
 
-            liste l = position_accessible(*jeu_, k + 1, id_pieces);
+            position_accessible(jeu_, k + 1, id_pieces, f, path);
             free(id_pieces);
-
-            for (liste l_i = l; !est_vide_liste(l_i); l_i = queue_liste(l_i)) {
-                enfiler(ajouter_tete_liste(tete_liste(l_i), copie_liste(path, copie_jeu)), f);
-            }
-
-            free_liste(l, NULL);
 
             // On passe au sous-ensemble suivant
             int i = k - 1;
@@ -341,15 +245,9 @@ liste v1 (jeu jeu_) {
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
                 if (jeu2->pieces[id_piece - 1]->bougeable) {
-                    liste l = position_accessible(*jeu2, 1, (int[]){id_piece});
+                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
 
-                    for (liste l_i = l; !est_vide_liste(l_i); l_i = queue_liste(l_i)) {
-                        enfiler(ajouter_tete_liste(tete_liste(l_i), copie_liste(path, copie_jeu)), &f);
-                    }
-
-                    free_liste(l, NULL);
-
-                    bouge_voisins(jeu2, id_piece, &f, path);
+                    bouge_voisins(*jeu2, id_piece, &f, path);
                 }
             }
 
@@ -427,15 +325,9 @@ liste v2 (jeu jeu_) {
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
                 if (jeu2->pieces[id_piece - 1]->bougeable) {
-                    liste l = position_accessible(*jeu2, 1, (int[]){id_piece});
+                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
 
-                    for (liste l_i = l; !est_vide_liste(l_i); l_i = queue_liste(l_i)) {
-                        enfiler(ajouter_tete_liste(tete_liste(l_i), copie_liste(path, copie_jeu)), &f);
-                    }
-
-                    free_liste(l, NULL);
-
-                    bouge_voisins(jeu2, id_piece, &f, path);
+                    bouge_voisins(*jeu2, id_piece, &f, path);
                 }
             }
 
@@ -491,15 +383,9 @@ liste v3 (jeu jeu_) {
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
                 if (jeu2->pieces[id_piece - 1]->bougeable) {
-                    liste l = position_accessible(*jeu2, 1, (int[]){id_piece});
+                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
 
-                    for (liste l_i = l; !est_vide_liste(l_i); l_i = queue_liste(l_i)) {
-                        enfiler(ajouter_tete_liste(tete_liste(l_i), copie_liste(path, copie_jeu)), &f);
-                    }
-
-                    free_liste(l, NULL);
-
-                    bouge_voisins(jeu2, id_piece, &f, path);
+                    bouge_voisins(*jeu2, id_piece, &f, path);
                 }
             }
 
@@ -561,15 +447,9 @@ liste v4 (jeu jeu_) {
                 int id_piece = i + 1;
 
                 if (jeu2->pieces[id_piece - 1]->bougeable) {
-                    liste l = position_accessible(*jeu2, 1, (int[]){id_piece});
+                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
 
-                    for (liste l_i = l; !est_vide_liste(l_i); l_i = queue_liste(l_i)) {
-                        enfiler(ajouter_tete_liste(tete_liste(l_i), copie_liste(path, copie_jeu)), &f);
-                    }
-
-                    free_liste(l, NULL);
-
-                    bouge_voisins(jeu2, id_piece, &f, path);
+                    bouge_voisins(*jeu2, id_piece, &f, path);
                 }
             }
 
