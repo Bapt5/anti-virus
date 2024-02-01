@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "main.c": "c",
+        "system_error": "c",
+        "piece.h": "c",
+        "file.h": "c",
+        "unistd.h": "c",
+        "librairies.h": "c",
+        "liste_chaine.h": "c"
+    }
+}
