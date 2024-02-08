@@ -39,6 +39,14 @@ void free_grille(jeu, int**);
 /**
     Paramètres:
         - filename: nom du fichier
+        Le fichier doit être de la forme:
+            taille: int
+            nb_pieces: int
+            sortie : int int
+            (id - 1) piece a sortir : int
+            1e ligne: int
+            2e ligne: int int int
+            ...
 
     Retourne:
         - l'instance de jeu décrit dans le fichier
@@ -71,7 +79,7 @@ void affiche_jeu_python(jeu, void*);
     Envoie la taille du jeu, le nombre de pièces et les caractéristiques des pièces sur la socket
     Envoie les positions des pièces sur la socket pour chaque étape de la solution
 */
-void affiche_sol_python(liste, void*);
+void affiche_sol_python(liste, int, void*);
 
 /**
     Paramètres:

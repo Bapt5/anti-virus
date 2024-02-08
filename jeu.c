@@ -338,7 +338,7 @@ void affiche_jeu_python(jeu jeu_, void* publisher) {
     zmq_send(publisher, "RESET", strlen("RESET"), 0);
 }
 
-void affiche_sol_python(liste sol, void* publisher) {
+void affiche_sol_python(liste sol, int pause, void* publisher) {
 
     envoyer_jeu_pieces(*(jeu*)tete_liste(sol), publisher);
     sleep(1);
@@ -349,7 +349,7 @@ void affiche_sol_python(liste sol, void* publisher) {
         zmq_send(publisher, "NEXT", strlen("NEXT"), 0);
 
         envoyer_positions_pieces(*(jeu*)tete_liste(l_i), publisher);
-        sleep(1);
+        sleep(pause);
     }
 
     // on envoie un RESET

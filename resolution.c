@@ -8,8 +8,55 @@ enum Direction_e {
 };
 typedef enum Direction_e Direction;
 
-// TODO: utiliser des tableaux dynamiques pour les listes ???
-// TODO: directions
+
+void voisins_piece_dir (jeu jeu_, int id_piece, Direction dir, liste* l, bool* deja_mise) {
+    /*
+    Paramètres:
+        - jeu_: le jeu
+        - id_piece: l'id de la pièce dont on veut les voisins
+        - dir: la direction dans laquelle on veut les voisins
+        - l: la liste dans laquelle on va ajouter les id des pièces voisines
+        - deja_mise: un tableau de booléens de taille jeu_.nb_pieces
+            indiquant si la pièce correspondante a déjà été mise dans la liste
+
+    Ajoute à l les id des pièces voisines de la pièce id_piece dans la direction dir
+    */
+
+    assert(id_piece >= 1 && id_piece <= jeu_.nb_pieces);
+
+    int** grille = construire_grille(jeu_);
+
+    piece* p = jeu_.pieces[jeu_.id_pieces[id_piece - 1]];
+
+    for (int k = 0; k < p->taille; k += 1) {
+        int i = p->pos.i + p->positions_rel[k].i;
+        int j = p->pos.j + p->positions_rel[k].j;
+
+        if (dir == HAUT) {
+            i -= 1;
+        } else if (dir == BAS) {
+            i += 1;
+        } else if (dir == GAUCHE) {
+            j -= 1;
+        } else if (dir == DROITE) {
+            j += 1;
+        }
+
+        if (est_valide((position){.i = i, .j = j}, jeu_.taille)) {
+            int val = grille[i][j];
+            if (val != 0 && val != p->id && !deja_mise[val - 1]) {
+                int* val_p = malloc(sizeof(int));
+                *val_p = val;
+
+                *l = ajouter_tete_liste(val_p, *l);
+                deja_mise[val - 1] = true;
+            }
+        }
+    }
+
+    free_grille(jeu_, grille);
+}
+
 liste voisins_piece (jeu jeu_, int id_piece) {
     /*
     Paramètres:
@@ -20,64 +67,14 @@ liste voisins_piece (jeu jeu_, int id_piece) {
         - une liste d'entiers contenant les id des pièces voisines de la pièce id_piece
     */
 
-    assert(id_piece >= 1 && id_piece <= jeu_.nb_pieces);
-
-    int** grille = construire_grille(jeu_);
-
     liste l = creer_liste();
-    
-    piece* p = jeu_.pieces[id_piece - 1];
+    bool* deja_mise = calloc(jeu_.nb_pieces, sizeof(bool));
 
-    for (int k = 0; k < p->taille; k += 1) {
-        int i = p->pos.i + p->positions_rel[k].i;
-        int j = p->pos.j + p->positions_rel[k].j;
-
-        position pos_bas = {.i = i + 1, .j = j};
-        if (est_valide(pos_bas, jeu_.taille)) {
-            int val = grille[pos_bas.i][pos_bas.j];
-            if (val != 0 && val != p->id && !appartient_liste(&val, l, egalite_int)) {
-                int* val_p = malloc(sizeof(int));
-                *val_p = val;
-
-                l = ajouter_tete_liste(val_p, l);
-            }
-        }
-
-        position pos_haut = {.i = i - 1, .j = j};
-        if (est_valide(pos_haut, jeu_.taille)) {
-            int val = grille[pos_haut.i][pos_haut.j];
-            if (val != 0 && val != p->id && !appartient_liste(&val, l, egalite_int)) {
-                int* val_p = malloc(sizeof(int));
-                *val_p = val;
-
-                l = ajouter_tete_liste(val_p, l);
-            }
-        }
-
-        position pos_droite = {.i = i, .j = j + 1};
-        if (est_valide(pos_droite, jeu_.taille)) {
-            int val = grille[pos_droite.i][pos_droite.j];
-            if (val != 0 && val != p->id && !appartient_liste(&val, l, egalite_int)) {
-                int* val_p = malloc(sizeof(int));
-                *val_p = val;
-
-                l = ajouter_tete_liste(val_p, l);
-            }
-        }
-
-        position pos_gauche = {.i = i, .j = j - 1};
-        if (est_valide(pos_gauche, jeu_.taille)) {
-            int val = grille[pos_gauche.i][pos_gauche.j];
-            if (val != 0 && val != p->id && !appartient_liste(&val, l, egalite_int)) {
-                int* val_p = malloc(sizeof(int));
-                *val_p = val;
-
-                l = ajouter_tete_liste(val_p, l);
-            }
-        }
+    for (int dir = 0; dir < 4; dir += 1) {
+        voisins_piece_dir(jeu_, id_piece, dir, &l, deja_mise);
     }
-
-    free_grille(jeu_, grille);
+    
+    free(deja_mise);
 
     return l;
 }
@@ -98,7 +95,7 @@ void position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, 
 
     for (int i = 0; i < n; i += 1) {
         assert(id_pieces[i] >= 1 && id_pieces[i] <= jeu_.nb_pieces);
-        assert(jeu_.pieces[id_pieces[i] - 1]->bougeable);
+        assert(jeu_.pieces[jeu_.id_pieces[id_pieces[i] - 1]]->bougeable);
     }
 
     jeu* jeu_copie = copie_jeu(&jeu_);
@@ -106,13 +103,13 @@ void position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, 
     for (int i = 1; i < jeu_.taille; i += 1) {
         for (int k = 0; k < n; k += 1) {
             if (dir == HAUT) {
-                jeu_copie->pieces[id_pieces[k] - 1]->pos.i -= i;
+                jeu_copie->pieces[jeu_copie->id_pieces[id_pieces[k] - 1]]->pos.i -= 1;
             } else if (dir == BAS) {
-                jeu_copie->pieces[id_pieces[k] - 1]->pos.i += i;
+                jeu_copie->pieces[jeu_copie->id_pieces[id_pieces[k] - 1]]->pos.i += 1;
             } else if (dir == GAUCHE) {
-                jeu_copie->pieces[id_pieces[k] - 1]->pos.j -= i;
+                jeu_copie->pieces[jeu_copie->id_pieces[id_pieces[k] - 1]]->pos.j -= 1;
             } else if (dir == DROITE) {
-                jeu_copie->pieces[id_pieces[k] - 1]->pos.j += i;
+                jeu_copie->pieces[jeu_copie->id_pieces[id_pieces[k] - 1]]->pos.j += 1;
             }
         }
 
@@ -160,7 +157,7 @@ void bouge_voisins (jeu jeu_, int id_piece, file* f, liste path) {
     liste voisins_l = voisins_piece(jeu_, id_piece);
     int nb_voisins_bougeables = 0;
     for (liste l_i = voisins_l; !est_vide_liste(l_i); l_i = queue_liste(l_i)) {
-        if (jeu_.pieces[*(int*)tete_liste(l_i) - 1]->bougeable) {
+        if (jeu_.pieces[jeu_.id_pieces[*(int*)tete_liste(l_i) - 1]]->bougeable) {
             nb_voisins_bougeables += 1;
         }
     }
@@ -175,7 +172,7 @@ void bouge_voisins (jeu jeu_, int id_piece, file* f, liste path) {
     int i = 0;
     for (liste l_i = voisins_l; !est_vide_liste(l_i); l_i = queue_liste(l_i)) {
         int* id_voisin = tete_liste(l_i);
-        if (jeu_.pieces[*id_voisin - 1]->bougeable) {
+        if (jeu_.pieces[jeu_.id_pieces[*id_voisin - 1]]->bougeable) {
             voisins[i] = *id_voisin;
             i += 1;
         }
@@ -244,7 +241,7 @@ liste v1 (jeu jeu_) {
             break;
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
-                if (jeu2->pieces[id_piece - 1]->bougeable) {
+                if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
                     position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
 
                     bouge_voisins(*jeu2, id_piece, &f, path);
@@ -324,7 +321,7 @@ liste v2 (jeu jeu_) {
             break;
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
-                if (jeu2->pieces[id_piece - 1]->bougeable) {
+                if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
                     position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
 
                     bouge_voisins(*jeu2, id_piece, &f, path);
@@ -382,7 +379,7 @@ liste v3 (jeu jeu_) {
             break;
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
-                if (jeu2->pieces[id_piece - 1]->bougeable) {
+                if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
                     position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
 
                     bouge_voisins(*jeu2, id_piece, &f, path);
@@ -442,11 +439,12 @@ liste v4 (jeu jeu_) {
         } else {
             // on mélange l'ordre des pièces
             melanger_pieces_jeu(jeu2);
+            // TODO: j'ai l'impression qu'on melange rien du tout revoir les id et indices
 
             for (int i = 0; i < jeu2->nb_pieces; i += 1) {
                 int id_piece = i + 1;
 
-                if (jeu2->pieces[id_piece - 1]->bougeable) {
+                if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
                     position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
 
                     bouge_voisins(*jeu2, id_piece, &f, path);
@@ -469,3 +467,5 @@ liste v4 (jeu jeu_) {
     return resultat;
 
 }
+
+// TODO: bouge voisins perte de temps dans certains cas
