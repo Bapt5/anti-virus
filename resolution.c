@@ -43,13 +43,13 @@ void voisins_piece_dir (jeu jeu_, int id_piece, Direction dir, liste* l, bool* d
         }
 
         if (est_valide((position){.i = i, .j = j}, jeu_.taille)) {
-            int val = grille[i][j];
-            if (val != 0 && val != p->id && !deja_mise[val - 1]) {
-                int* val_p = malloc(sizeof(int));
-                *val_p = val;
+            int id = grille[i][j];
+            if (id != 0 && id != p->id && !deja_mise[id - 1]) {
+                int* id_p = malloc(sizeof(int));
+                *id_p = id;
 
-                *l = ajouter_tete_liste(val_p, *l);
-                deja_mise[val - 1] = true;
+                *l = ajouter_tete_liste(id_p, *l);
+                deja_mise[id - 1] = true;
             }
         }
     }
@@ -439,12 +439,12 @@ liste v4 (jeu jeu_) {
         } else {
             // on mélange l'ordre des pièces
             melanger_pieces_jeu(jeu2);
-            // TODO: j'ai l'impression qu'on melange rien du tout revoir les id et indices
 
             for (int i = 0; i < jeu2->nb_pieces; i += 1) {
-                int id_piece = i + 1;
+                piece* p = jeu2->pieces[i];
+                int id_piece = p->id;
 
-                if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
+                if (p->bougeable) {
                     position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
 
                     bouge_voisins(*jeu2, id_piece, &f, path);

@@ -13,7 +13,7 @@ struct jeu_s
     int nb_pieces;
     piece** pieces;
     int piece_a_sortir;
-    int* id_pieces;
+    int* id_pieces;  // associe l'id de la pièce à sa position dans le tableau de pièces
 };
 typedef struct jeu_s jeu;
 
