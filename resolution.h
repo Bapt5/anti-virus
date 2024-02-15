@@ -19,7 +19,7 @@
         - on utilise une brute force en essayant toutes les combinaisons de pièces
           à bouger
 */
-liste v1(jeu);
+liste v1(jeu, int*);
 
 /**
     Paramètres:
@@ -33,7 +33,7 @@ liste v1(jeu);
           à bouger
         - on stocke les grilles déjà vues dans une liste pour ne pas les revoir
 */
-liste v2(jeu);
+liste v2(jeu, int*);
 
 /*
     Paramètres:
@@ -48,7 +48,7 @@ liste v2(jeu);
         - on stocke les grilles déjà vues dans un arbre binaire (améliore la complexité) de recherche pour
           ne pas les revoir
 */
-liste v3(jeu);
+liste v3(jeu, int*);
 
 /*
     Paramètres:
@@ -60,6 +60,6 @@ liste v3(jeu);
     Méthode:
         - on choisi aléatoirement la pièce suivante à bouger
 */
-liste v4(jeu);
+liste v4(jeu, int*);
 
 #endif

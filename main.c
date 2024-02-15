@@ -6,12 +6,16 @@
 
 #include <time.h>
 
-liste get_solution(liste(*f)(jeu), jeu* j) {
+liste get_solution(liste(*f)(jeu, int*), jeu* j) {
+    int nb_explo = 0;
+
     clock_t debut = clock();
-    liste resultat = f(*j);
+    liste resultat = f(*j, &nb_explo);
     clock_t fin = clock();
 
     double temps_execution = (double)(fin - debut) / CLOCKS_PER_SEC;
+
+    printf("Nombre d'explorations %d\n", nb_explo);
 
     if (est_vide_liste(resultat)) {
         printf("Temps d'exécution %f s\n", temps_execution);
@@ -25,10 +29,14 @@ liste get_solution(liste(*f)(jeu), jeu* j) {
     return resultat;
 }
 
-void test_fonction(char* nom_fonction, char* nom_jeu, liste(*f)(jeu), jeu* j, bool affiche_solution, int pause, void* publisher) {
+void test_fonction(char* nom_fonction, char* nom_jeu, liste(*f)(jeu, int*), jeu* j, bool affiche_solution, int pause, void* publisher) {
     printf("Test %s sur %s: \n", nom_fonction, nom_jeu);
-    sleep(1);
-    affiche_jeu_python(*j, publisher);
+
+    if (affiche_solution) {
+        printf("Affichage de l'instance de jeu\n");
+        affiche_jeu_python(*j, publisher);
+        sleep(pause);
+    }
 
     liste resultat = get_solution(f, j);
 
@@ -55,7 +63,7 @@ void test_fonction(char* nom_fonction, char* nom_jeu, liste(*f)(jeu), jeu* j, bo
 int main()
 {
     bool affiche_solution = false;
-    int pause = 3;
+    int pause = 1;
 
     /* STARTER 1 */
     jeu* starter1 = creer_jeu("instances/starter1");
@@ -85,30 +93,30 @@ int main()
         return 1;
     }
 
-    test_fonction("v1", "starter 1", v1, starter1, affiche_solution, pause, publisher);
-    test_fonction("v2", "starter 1", v2, starter1, affiche_solution, pause, publisher);
-    test_fonction("v3", "starter 1", v3, starter1, affiche_solution, pause, publisher);
-    test_fonction("v4", "starter 1", v4, starter1, affiche_solution, pause, publisher);
-    printf("\n");
+    // test_fonction("v1", "starter 1", v1, starter1, affiche_solution, pause, publisher);
+    // test_fonction("v2", "starter 1", v2, starter1, affiche_solution, pause, publisher);
+    // test_fonction("v3", "starter 1", v3, starter1, affiche_solution, pause, publisher);
+    // test_fonction("v4", "starter 1", v4, starter1, affiche_solution, pause, publisher);
+    // printf("\n");
 
-    test_fonction("v2", "junior 17", v2, junior17, affiche_solution, pause, publisher);
-    test_fonction("v3", "junior 17", v3, junior17, affiche_solution, pause, publisher);
-    test_fonction("v4", "junior 17", v4, junior17, affiche_solution, pause, publisher);
-    printf("\n");
+    // test_fonction("v2", "junior 17", v2, junior17, affiche_solution, pause, publisher);
+    // test_fonction("v3", "junior 17", v3, junior17, affiche_solution, pause, publisher);
+    // test_fonction("v4", "junior 17", v4, junior17, affiche_solution, pause, publisher);
+    // printf("\n");
 
-    test_fonction("v2", "wizard 60", v2, wizard60, affiche_solution, pause, publisher);
-    test_fonction("v3", "wizard 60", v3, wizard60, affiche_solution, pause, publisher);
-    test_fonction("v4", "wizard 60", v4, wizard60, affiche_solution, pause, publisher);
-    printf("\n");
+    // test_fonction("v2", "wizard 60", v2, wizard60, affiche_solution, pause, publisher);
+    // test_fonction("v3", "wizard 60", v3, wizard60, affiche_solution, pause, publisher);
+    // test_fonction("v4", "wizard 60", v4, wizard60, affiche_solution, pause, publisher);
+    // printf("\n");
 
-    test_fonction("v2", "expert 33", v2, expert33, affiche_solution, pause, publisher);
-    test_fonction("v3", "expert 33", v3, expert33, affiche_solution, pause, publisher);
-    test_fonction("v4", "expert 33", v4, expert33, affiche_solution, pause, publisher);
-    printf("\n");
+    // test_fonction("v2", "expert 33", v2, expert33, affiche_solution, pause, publisher);
+    // test_fonction("v3", "expert 33", v3, expert33, affiche_solution, pause, publisher);
+    // test_fonction("v4", "expert 33", v4, expert33, affiche_solution, pause, publisher);
+    // printf("\n");
 
-    test_fonction("v2", "wizard 52", v2, wizard52, affiche_solution, pause, publisher);
-    test_fonction("v3", "wizard 52", v3, wizard52, affiche_solution, pause, publisher);
-    test_fonction("v4", "wizard 52", v4, wizard52, affiche_solution, pause, publisher);
+    // test_fonction("v2", "wizard 52", v2, wizard52, affiche_solution, pause, publisher);
+    // test_fonction("v3", "wizard 52", v3, wizard52, affiche_solution, pause, publisher);
+    // test_fonction("v4", "wizard 52", v4, wizard52, affiche_solution, pause, publisher);
 
 
 

@@ -219,7 +219,7 @@ void bouge_voisins (jeu jeu_, int id_piece, file* f, liste path) {
     free(voisins);
 }
 
-liste v1 (jeu jeu_) {
+liste v1 (jeu jeu_, int* nb_explo) {
     liste resultat = creer_liste();
 
     file f = creer_file();
@@ -231,6 +231,8 @@ liste v1 (jeu jeu_) {
     while (!est_vide_file(f)) {
         liste path = defiler(&f);
         jeu* jeu2 = tete_liste(path);
+
+        (*nb_explo)++;
 
         // affiche_jeu(*jeu2);
 
@@ -288,7 +290,7 @@ unsigned long long hash_jeu(jeu jeu_) {
     return hashValue;
 }
 
-liste v2 (jeu jeu_) {
+liste v2 (jeu jeu_, int* nb_explo) {
     liste resultat = creer_liste();
 
     liste vus = creer_liste();
@@ -310,6 +312,8 @@ liste v2 (jeu jeu_) {
 
             continue;
         }
+
+        (*nb_explo)++;
 
         // printf("%llu\n", hash);
         // affiche_jeu(*jeu2);
@@ -346,7 +350,7 @@ liste v2 (jeu jeu_) {
     return resultat;
 }
 
-liste v3 (jeu jeu_) {
+liste v3 (jeu jeu_, int* nb_explo) {
     liste resultat = creer_liste();
 
     abr vus = creer_abr();
@@ -369,6 +373,8 @@ liste v3 (jeu jeu_) {
             continue;
         }
 
+        (*nb_explo)++;
+
         // printf("%llu\n", hash);
         // affiche_jeu(*jeu2);
 
@@ -379,6 +385,10 @@ liste v3 (jeu jeu_) {
             break;
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
+                int profondeur = longueur_liste(path) - 1;
+
+                printf("%d;%d\n", f.taille, profondeur); //TODO: à supprimer
+
                 if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
                     position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
 
@@ -402,7 +412,7 @@ liste v3 (jeu jeu_) {
     return resultat;
 }
 
-liste v4 (jeu jeu_) {
+liste v4 (jeu jeu_, int* nb_explo) {
     // initialisation random
     srand(time(NULL));
 
@@ -427,6 +437,8 @@ liste v4 (jeu jeu_) {
 
             continue;
         }
+
+        (*nb_explo)++;
 
         // printf("%llu\n", hash);
         // affiche_jeu(*jeu2);
