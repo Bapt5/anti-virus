@@ -4,11 +4,14 @@ install:
 graphic: graphic.bat
 	cmd.exe /c "start /min graphic.bat" &
 
-build: liste_chaine.c file.c piece.c jeu.c main.c
+build_warning: egalite.c liste_chaine.c file.c piece.c abr.c jeu.c resolution.c main.c
 	gcc -Wall -Wextra -fsanitize=address -lzmq -o main.out egalite.c liste_chaine.c file.c piece.c abr.c jeu.c resolution.c main.c
 
-run: main.out
-	./main.out
+build: egalite.c liste_chaine.c file.c piece.c abr.c jeu.c resolution.c main.c
+	gcc -w -fsanitize=address -lzmq -o main.out egalite.c liste_chaine.c file.c piece.c abr.c jeu.c resolution.c main.c
+
+run: main.out 
+	./main.out $(MFLAGS)
 
 all: build run
 
