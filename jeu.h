@@ -123,6 +123,6 @@ bool est_valide_jeu(jeu);
 
     Mélange les pièces du jeu
 */
-void melanger_jeu(jeu*);
+void melanger_pieces_jeu (jeu*);
 
 #endif
