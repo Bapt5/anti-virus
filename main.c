@@ -95,28 +95,33 @@ int main()
 
     // test_fonction("v1", "starter 1", v1, starter1, affiche_solution, pause, publisher);
     // test_fonction("v2", "starter 1", v2, starter1, affiche_solution, pause, publisher);
-    // test_fonction("v3", "starter 1", v3, starter1, affiche_solution, pause, publisher);
+    test_fonction("v3", "starter 1", v3, starter1, affiche_solution, pause, publisher);
     // test_fonction("v4", "starter 1", v4, starter1, affiche_solution, pause, publisher);
+    test_fonction("v5", "starter 1", v5, starter1, affiche_solution, pause, publisher);
     // printf("\n");
 
     // test_fonction("v2", "junior 17", v2, junior17, affiche_solution, pause, publisher);
-    // test_fonction("v3", "junior 17", v3, junior17, affiche_solution, pause, publisher);
+    test_fonction("v3", "junior 17", v3, junior17, affiche_solution, pause, publisher);
     // test_fonction("v4", "junior 17", v4, junior17, affiche_solution, pause, publisher);
-    // printf("\n");
+    test_fonction("v5", "junior 17", v5, junior17, affiche_solution, pause, publisher);
+    printf("\n");
 
     // test_fonction("v2", "wizard 60", v2, wizard60, affiche_solution, pause, publisher);
-    // test_fonction("v3", "wizard 60", v3, wizard60, affiche_solution, pause, publisher);
+    test_fonction("v3", "wizard 60", v3, wizard60, affiche_solution, pause, publisher);
     // test_fonction("v4", "wizard 60", v4, wizard60, affiche_solution, pause, publisher);
+    test_fonction("v5", "wizard 60", v5, wizard60, affiche_solution, pause, publisher);
     // printf("\n");
 
     // test_fonction("v2", "expert 33", v2, expert33, affiche_solution, pause, publisher);
-    // test_fonction("v3", "expert 33", v3, expert33, affiche_solution, pause, publisher);
+    test_fonction("v3", "expert 33", v3, expert33, affiche_solution, pause, publisher);
     // test_fonction("v4", "expert 33", v4, expert33, affiche_solution, pause, publisher);
+    test_fonction("v5", "expert 33", v5, expert33, affiche_solution, pause, publisher);
     // printf("\n");
 
     // test_fonction("v2", "wizard 52", v2, wizard52, affiche_solution, pause, publisher);
-    // test_fonction("v3", "wizard 52", v3, wizard52, affiche_solution, pause, publisher);
+    test_fonction("v3", "wizard 52", v3, wizard52, affiche_solution, pause, publisher);
     // test_fonction("v4", "wizard 52", v4, wizard52, affiche_solution, pause, publisher);
+    test_fonction("v5", "wizard 52", v5, wizard52, affiche_solution, pause, publisher);
 
 
 

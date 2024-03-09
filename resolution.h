@@ -7,6 +7,9 @@
 #include "liste_chaine.h"
 #include "file.h"
 #include "abr.h"
+#include "tas_min.h"
+
+#include <time.h>
 
 /**
     Paramètres:
@@ -61,5 +64,18 @@ liste v3(jeu, int*);
         - on choisi aléatoirement la pièce suivante à bouger
 */
 liste v4(jeu, int*);
+
+/*
+    Paramètres:
+        - jeu_: le jeu
+
+    Retourne:
+        - une liste de jeu* contenant les états du jeu menant à la solution
+
+    Méthode:
+        - on utilise une file de priorité pour stocker les états du jeu 
+            (priorité = distance pièce à sortir jusqu'à la sortie)
+*/
+liste v5(jeu, int*);
 
 #endif

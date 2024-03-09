@@ -79,7 +79,7 @@ liste voisins_piece (jeu jeu_, int id_piece) {
     return l;
 }
 
-void position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, file* f, liste path) {
+void position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, void* f, void (*ajout)(void*, void*), liste path) {
     /* 
     Paramètres:
         - jeu_: le jeu
@@ -87,6 +87,7 @@ void position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, 
         - id_pieces: un tableau contenant les id des pièces à essayer de bouger
         - dir: la direction dans laquelle on veut bouger les pièces
         - f: la file dans laquelle on va ajouter les grilles accessibles
+        - ajout: la fonction pour ajouter un élément à f
         - path: le chemin menant à la grille actuelle
 
     Ajoute à f les grilles accessibles en bougeant les pièces
@@ -116,7 +117,7 @@ void position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, 
         if (est_valide_jeu(*jeu_copie)) {
             jeu* jeu2 = copie_jeu(jeu_copie);
 
-            enfiler(ajouter_tete_liste(jeu2, copie_liste(path, copie_jeu)), f);
+            ajout(ajouter_tete_liste(jeu2, copie_liste(path, copie_jeu)), f);
         } else {
             break;
         }
@@ -126,29 +127,31 @@ void position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, 
     free_jeu(jeu_copie);
 }
 
-void position_accessible (jeu jeu_, int n, int id_pieces[n], file* f, liste path) {
+void position_accessible (jeu jeu_, int n, int id_pieces[n], void* f, void (*ajout)(void*, void*), liste path) {
     /*
     Paramètres: 
         - jeu_: le jeu
         - n: le nombre de pièces à essayer de bouger
         - id_pieces: un tableau contenant les id des pièces à essayer de bouger
         - f: la file dans laquelle on va ajouter les grilles accessibles
+        - ajout: la fonction pour ajouter un élément à f
         - path: le chemin menant à la grille actuelle
     Ajoute à f les grilles accessibles en bougeant les pièces id_pieces[0], ..., id_pieces[n - 1]
     */
     
     for (int dir = 0; dir < 4; dir += 1) {
-        position_accessible_dir(jeu_, n, id_pieces, dir, f, path);
+        position_accessible_dir(jeu_, n, id_pieces, dir, f, ajout, path);
     }
     
 }
 
-void bouge_voisins (jeu jeu_, int id_piece, file* f, liste path) {
+void bouge_voisins (jeu jeu_, int id_piece, void* f, void (*ajout)(void*, void*), liste path) {
     /*
     Paramètres:
         - jeu_: le jeu
         - id_piece: l'id de la pièce dont on veut bouger les voisins
         - f: la file dans laquelle on va ajouter les grilles accessibles
+        - ajout: la fonction pour ajouter un élément à f
         - path: le chemin menant à la grille actuelle
 
     Ajoute à f les grilles accessibles en bougeant les voisins de la pièce id_piece
@@ -196,7 +199,7 @@ void bouge_voisins (jeu jeu_, int id_piece, file* f, liste path) {
             }
             id_pieces[k] = id_piece;
 
-            position_accessible(jeu_, k + 1, id_pieces, f, path);
+            position_accessible(jeu_, k + 1, id_pieces, f, ajout, path);
             free(id_pieces);
 
             // On passe au sous-ensemble suivant
@@ -244,9 +247,9 @@ liste v1 (jeu jeu_, int* nb_explo) {
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
                 if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
-                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
+                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path);
 
-                    bouge_voisins(*jeu2, id_piece, &f, path);
+                    bouge_voisins(*jeu2, id_piece, &f, enfiler, path);
                 }
             }
 
@@ -326,9 +329,9 @@ liste v2 (jeu jeu_, int* nb_explo) {
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
                 if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
-                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
+                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path);
 
-                    bouge_voisins(*jeu2, id_piece, &f, path);
+                    bouge_voisins(*jeu2, id_piece, &f, enfiler, path);
                 }
             }
 
@@ -387,12 +390,10 @@ liste v3 (jeu jeu_, int* nb_explo) {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
                 int profondeur = longueur_liste(path) - 1;
 
-                printf("%d;%d\n", f.taille, profondeur); //TODO: à supprimer
-
                 if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
-                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
+                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path);
 
-                    bouge_voisins(*jeu2, id_piece, &f, path);
+                    bouge_voisins(*jeu2, id_piece, &f, enfiler, path);
                 }
             }
 
@@ -457,9 +458,9 @@ liste v4 (jeu jeu_, int* nb_explo) {
                 int id_piece = p->id;
 
                 if (p->bougeable) {
-                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, path);
+                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path);
 
-                    bouge_voisins(*jeu2, id_piece, &f, path);
+                    bouge_voisins(*jeu2, id_piece, &f, enfiler, path);
                 }
             }
 
@@ -478,6 +479,87 @@ liste v4 (jeu jeu_, int* nb_explo) {
 
     return resultat;
 
+}
+
+void ajout_grille_prio (liste path, tas_min* tas) {
+    /*
+    Paramètres:
+        - path: le chemin menant à la grille
+        - tas: le tas dans lequel on va ajouter la grille
+    
+    Ajoute à tas la grille à la fin de path avec une priorité 
+    égale à la distance de la piece à sortir à la sortie dans la dernière grille
+    */
+
+    jeu* jeu2 = tete_liste(path);
+
+    piece* piece_a_sortir = jeu2->pieces[jeu2->id_pieces[jeu2->piece_a_sortir]];
+
+    int distance = ((jeu2->sortie.i - piece_a_sortir->pos.i) * (jeu2->sortie.i - piece_a_sortir->pos.i)) + 
+                    ((jeu2->sortie.j - piece_a_sortir->pos.j) * (jeu2->sortie.j - piece_a_sortir->pos.j));
+
+    inserer_tas_min(path, distance, tas);
+}
+
+liste v5 (jeu jeu_, int* nb_explo) {
+    liste resultat = creer_liste();
+
+    abr vus = creer_abr();
+
+    int capacite_tas = jeu_.nb_pieces * jeu_.nb_pieces * jeu_.taille * jeu_.taille;
+    tas_min tas = creer_tas_min(capacite_tas);
+
+    jeu* g_copie = copie_jeu(&jeu_);
+
+    inserer_tas_min(ajouter_tete_liste(g_copie, resultat), 0, &tas);
+
+    while (!est_vide_tas_min(tas)) {
+        liste path = extraire_min_tas_min(&tas);
+        jeu* jeu2 = tete_liste(path);
+
+        unsigned long long hash = hash_jeu(*jeu2);
+
+        if (trouver_abr(vus, hash)) {
+            free_liste(path, free_jeu);
+
+            continue;
+        }
+
+        (*nb_explo)++;
+
+        // printf("%llu\n", hash);
+        // affiche_jeu(*jeu2);
+
+        if (est_resolu(*jeu2)) {
+            resultat = inverser_liste(path, NULL);
+
+            free_liste(path, NULL);
+            break;
+        } else {
+            for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
+                if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
+                    position_accessible(*jeu2, 1, (int[]){id_piece}, &tas, ajout_grille_prio, path);
+
+                    bouge_voisins(*jeu2, id_piece, &tas, ajout_grille_prio, path);
+                }
+            }
+
+            // on marque comme vu cette grille
+            ajouter_abr(&vus, hash);
+        }
+
+        free_liste(path, free_jeu);
+    }
+
+    free_abr(vus);
+
+    // on vide le tas
+    while (!est_vide_tas_min(tas)) {
+        free_liste(extraire_min_tas_min(&tas), free_jeu);
+    }
+    free_tas_min(&tas, free_liste);
+
+    return resultat;
 }
 
 // TODO: bouge voisins perte de temps dans certains cas
