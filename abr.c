@@ -64,9 +64,8 @@ bool trouver_abr (abr a, unsigned long long val) {
     } else if (val < a->valeur) {
         return trouver_abr(a->gauche, val);
 
-    } else if (a->valeur < val) {
+    } else {
         return trouver_abr(a->droite, val);
-
     }
 }
 
