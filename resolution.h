@@ -14,6 +14,7 @@
 /**
     Paramètres:
         - jeu_: le jeu
+        - nb_explo: un pointeur vers un entier dans lequel on va stocker le nombre d'explorations
 
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
@@ -27,6 +28,7 @@ liste v1(jeu, int*);
 /**
     Paramètres:
         - jeu_: le jeu
+        - nb_explo: un pointeur vers un entier dans lequel on va stocker le nombre d'explorations
     
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
@@ -41,6 +43,7 @@ liste v2(jeu, int*);
 /*
     Paramètres:
         - jeu_: le jeu
+        - nb_explo: un pointeur vers un entier dans lequel on va stocker le nombre d'explorations
 
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
@@ -56,6 +59,7 @@ liste v3(jeu, int*);
 /*
     Paramètres:
         - jeu_: le jeu
+        - nb_explo: un pointeur vers un entier dans lequel on va stocker le nombre d'explorations
 
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
@@ -68,6 +72,7 @@ liste v4(jeu, int*);
 /*
     Paramètres:
         - jeu_: le jeu
+        - nb_explo: un pointeur vers un entier dans lequel on va stocker le nombre d'explorations
 
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
@@ -77,5 +82,19 @@ liste v4(jeu, int*);
             (priorité = distance pièce à sortir jusqu'à la sortie)
 */
 liste v5(jeu, int*);
+
+/*
+    Paramètres:
+        - jeu_: le jeu
+        - nb_explo: un pointeur vers un entier dans lequel on va stocker le nombre d'explorations
+
+    Retourne:
+        - une liste de jeu* contenant les états du jeu menant à la solution
+
+    Méthode:
+        - on utilise un tas min pour stocker les états du jeu 
+            (priorité = nombre de pièces bloquant la pièce à sortir)
+*/
+liste v6(jeu, int*);
 
 #endif

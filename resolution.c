@@ -481,27 +481,75 @@ liste v4 (jeu jeu_, int* nb_explo) {
 
 }
 
-void ajout_grille_prio (liste path, tas_min* tas) {
+void heuristique1 (liste path, tas_min* tas) {
     /*
     Paramètres:
         - path: le chemin menant à la grille
         - tas: le tas dans lequel on va ajouter la grille
     
-    Ajoute à tas la grille à la fin de path avec une priorité 
-    égale à la distance de la piece à sortir à la sortie dans la dernière grille
+    Ajoute à tas la grille à la fin de path avec une priorité égale à 
+    la distance entre la pièce à sortir et la sortie
     */
 
-    jeu* jeu2 = tete_liste(path);
+    jeu* jeu_ = tete_liste(path);
 
-    piece* piece_a_sortir = jeu2->pieces[jeu2->id_pieces[jeu2->piece_a_sortir]];
+    piece* piece_a_sortir = jeu_->pieces[jeu_->id_pieces[jeu_->piece_a_sortir]];
 
-    int distance = ((jeu2->sortie.i - piece_a_sortir->pos.i) * (jeu2->sortie.i - piece_a_sortir->pos.i)) + 
-                    ((jeu2->sortie.j - piece_a_sortir->pos.j) * (jeu2->sortie.j - piece_a_sortir->pos.j));
+    int distance = ((jeu_->sortie.i - piece_a_sortir->pos.i) * (jeu_->sortie.i - piece_a_sortir->pos.i)) + 
+                    ((jeu_->sortie.j - piece_a_sortir->pos.j) * (jeu_->sortie.j - piece_a_sortir->pos.j));
 
     inserer_tas_min(path, distance, tas);
 }
 
-liste v5 (jeu jeu_, int* nb_explo) {
+void heuristique2 (liste path, tas_min* tas) {
+    /*
+    Paramètres:
+        - path: le chemin menant à la grille
+        - tas: le tas dans lequel on va ajouter la grille
+
+    Ajoute à tas la grille à la fin de path avec une priorité égale au
+    nombre de pièces bloquant la pièce à sortir dans la dernière grille
+    */
+
+    jeu* jeu_ = tete_liste(path);
+
+    piece* piece_a_sortir = jeu_->pieces[jeu_->id_pieces[jeu_->piece_a_sortir]];
+
+    liste l = creer_liste();
+    bool* deja_mise = calloc(jeu_->nb_pieces, sizeof(bool));
+
+    if (piece_a_sortir->pos.i > jeu_->sortie.i) {
+        voisins_piece_dir(*jeu_, piece_a_sortir->id, HAUT, &l, deja_mise);
+    } else if (piece_a_sortir->pos.i < jeu_->sortie.i) {
+        voisins_piece_dir(*jeu_, piece_a_sortir->id, BAS, &l, deja_mise);
+    }
+    
+    if (piece_a_sortir->pos.j > jeu_->sortie.j) {
+        voisins_piece_dir(*jeu_, piece_a_sortir->id, GAUCHE, &l, deja_mise);
+    } else if (piece_a_sortir->pos.j < jeu_->sortie.j) {
+        voisins_piece_dir(*jeu_, piece_a_sortir->id, DROITE, &l, deja_mise);
+    }
+
+    int nb_bloquants = longueur_liste(l);
+
+    free_liste(l, free);
+    free(deja_mise);
+
+    inserer_tas_min(path, nb_bloquants, tas);
+}
+
+
+liste v_heuristique (jeu jeu_, int* nb_explo, void (*heuristique)(liste, tas_min* tas)) {
+    /*
+    Paramètres:
+        - jeu_: le jeu
+        - nb_explo: un pointeur vers un entier dans lequel on va stocker le nombre d'explorations
+        - heuristique: la fonction d'heuristique à utiliser
+    
+    Retourne:
+        - une liste de jeu* contenant les états du jeu menant à la solution
+    */
+
     liste resultat = creer_liste();
 
     abr vus = creer_abr();
@@ -538,9 +586,9 @@ liste v5 (jeu jeu_, int* nb_explo) {
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
                 if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
-                    position_accessible(*jeu2, 1, (int[]){id_piece}, &tas, ajout_grille_prio, path);
+                    position_accessible(*jeu2, 1, (int[]){id_piece}, &tas, heuristique, path);
 
-                    bouge_voisins(*jeu2, id_piece, &tas, ajout_grille_prio, path);
+                    bouge_voisins(*jeu2, id_piece, &tas, heuristique, path);
                 }
             }
 
@@ -561,5 +609,14 @@ liste v5 (jeu jeu_, int* nb_explo) {
 
     return resultat;
 }
+
+liste v5 (jeu jeu_, int* nb_explo) {    
+    return v_heuristique(jeu_, nb_explo, heuristique1);
+}
+
+liste v6 (jeu jeu_, int* nb_explo) {
+    return v_heuristique(jeu_, nb_explo, heuristique2);
+}
+
 
 // TODO: bouge voisins perte de temps dans certains cas
