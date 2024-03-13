@@ -481,6 +481,19 @@ liste v4 (jeu jeu_, int* nb_explo) {
 
 }
 
+int distance (position p1, position p2) {
+    /*
+    Paramètres:
+        - p1: une position
+        - p2: une position
+    
+    Retourne:
+        - la distance entre p1 et p2
+    */
+
+    return (p1.i - p2.i) * (p1.i - p2.i) + (p1.j - p2.j) * (p1.j - p2.j);
+}
+
 void heuristique1 (liste path, tas_min* tas) {
     /*
     Paramètres:
@@ -495,10 +508,9 @@ void heuristique1 (liste path, tas_min* tas) {
 
     piece* piece_a_sortir = jeu_->pieces[jeu_->id_pieces[jeu_->piece_a_sortir]];
 
-    int distance = ((jeu_->sortie.i - piece_a_sortir->pos.i) * (jeu_->sortie.i - piece_a_sortir->pos.i)) + 
-                    ((jeu_->sortie.j - piece_a_sortir->pos.j) * (jeu_->sortie.j - piece_a_sortir->pos.j));
+    int d = distance(piece_a_sortir->pos, jeu_->sortie);
 
-    inserer_tas_min(path, distance, tas);
+    inserer_tas_min(path, d, tas);
 }
 
 void heuristique2 (liste path, tas_min* tas) {
@@ -536,6 +548,36 @@ void heuristique2 (liste path, tas_min* tas) {
     free(deja_mise);
 
     inserer_tas_min(path, nb_bloquants, tas);
+}
+
+void heuristique3 (liste path, tas_min* tas) {
+    /*
+    Paramètres:
+        - path: le chemin menant à la grille
+        - tas: le tas dans lequel on va ajouter la grille
+
+    Ajoute à tas la grille à la fin de path avec une priorité égale au
+    nombre de pièces sur le chemin de la pièce à sortir dans la dernière grille
+    */
+
+    jeu* jeu_ = tete_liste(path);
+
+    piece* piece_a_sortir = jeu_->pieces[jeu_->id_pieces[jeu_->piece_a_sortir]];
+
+    int d_sortie = distance(piece_a_sortir->pos, jeu_->sortie);
+
+    int prio = 0;
+
+    for (int i = 0; i < jeu_->nb_pieces; i += 1) {
+        piece* p = jeu_->pieces[i];
+
+        if (distance(p->pos, jeu_->sortie) < d_sortie) {
+            prio += 1;
+        }
+    }
+
+    inserer_tas_min(path, prio, tas);
+
 }
 
 
@@ -616,6 +658,10 @@ liste v5 (jeu jeu_, int* nb_explo) {
 
 liste v6 (jeu jeu_, int* nb_explo) {
     return v_heuristique(jeu_, nb_explo, heuristique2);
+}
+
+liste v7 (jeu jeu_, int* nb_explo) {
+    return v_heuristique(jeu_, nb_explo, heuristique3);
 }
 
 

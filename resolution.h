@@ -97,4 +97,17 @@ liste v5(jeu, int*);
 */
 liste v6(jeu, int*);
 
+/*
+    Paramètres:
+        - jeu_: le jeu
+        - nb_explo: un pointeur vers un entier dans lequel on va stocker le nombre d'explorations
+
+    Retourne:
+        - une liste de jeu* contenant les états du jeu menant à la solution
+
+    Méthode:
+        - on utilise un tas min pour stocker les états du jeu 
+            (priorité = nombre de pieces sur le chemin de la pièce à sortir)
+*/
+liste v7(jeu, int*);
 #endif
