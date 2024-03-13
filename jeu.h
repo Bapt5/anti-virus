@@ -114,6 +114,9 @@ bool est_resolu(jeu);
     Retourne:
         - true si quand on place les pièces, elles ne se chevauchent pas et ne sortent pas du jeu
         - false sinon
+
+    Complexité: O(nombre de piece * nombre de case par piece)
+    // TODO: A améliorer si possible
 */
 bool est_valide_jeu(jeu);
 

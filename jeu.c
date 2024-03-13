@@ -83,25 +83,8 @@ void free_grille(jeu jeu_, int** grille) {
 }
 
 bool est_valide_jeu(jeu jeu_) {
-    // TODO: optimiser
-    int** grille = malloc((jeu_.taille) * sizeof(int*));
+    int* grille = calloc(jeu_.taille*jeu_.taille, sizeof(int));
     assert(grille != NULL);
-
-    // on créé la grille
-    for (int i = 0; i < jeu_.taille; i += 1){
-        int l_ligne = taille_ligne(jeu_, i);
-
-        grille[i] = malloc(jeu_.taille * sizeof(int));
-        assert(grille[i] != NULL);
-
-        for (int j = 0; j < jeu_.taille; j += 1) {
-            if (j < (jeu_.taille - l_ligne)/2 || j >= (jeu_.taille + l_ligne)/2) {
-                grille[i][j] = -1;
-            } else {
-                grille[i][j] = 0;
-            }
-        }
-    }
 
     // on place les pièces
     for (int k = 0; k < jeu_.nb_pieces; k += 1) {
@@ -111,16 +94,18 @@ bool est_valide_jeu(jeu jeu_) {
             int i_ = p->pos.i + p->positions_rel[i].i;
             int j_ = p->pos.j + p->positions_rel[i].j;
 
-            if (!est_vide_case(jeu_, grille, (position){.i = i_, .j = j_})) {
-                free_grille(jeu_, grille);
+            position pos_case = {.i = i_, .j = j_};
+
+            if (!est_valide(pos_case, jeu_.taille) || grille[i_*jeu_.taille + j_] != 0) {
+                free(grille);
                 return false;
             }
 
-            grille[i_][j_] = p->id;
+            grille[i_*jeu_.taille + j_] = p->id;
         }
     }
 
-    free_grille(jeu_, grille);
+    free(grille);
 
     return true;
 }
