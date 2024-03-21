@@ -222,7 +222,7 @@ void bouge_voisins (jeu jeu_, int id_piece, void* f, void (*ajout)(void*, void*)
     free(voisins);
 }
 
-liste v1 (jeu jeu_, int* nb_explo) {
+liste v0 (jeu jeu_, int* nb_explo) {
     liste resultat = creer_liste();
 
     file f = creer_file();
@@ -293,7 +293,7 @@ unsigned long long hash_jeu(jeu jeu_) {
     return hashValue;
 }
 
-liste v2 (jeu jeu_, int* nb_explo) {
+liste v1 (jeu jeu_, int* nb_explo) {
     liste resultat = creer_liste();
 
     liste vus = creer_liste();
@@ -353,7 +353,7 @@ liste v2 (jeu jeu_, int* nb_explo) {
     return resultat;
 }
 
-liste v3 (jeu jeu_, int* nb_explo) {
+liste v2 (jeu jeu_, int* nb_explo) {
     liste resultat = creer_liste();
 
     abr vus = creer_abr();
@@ -413,7 +413,7 @@ liste v3 (jeu jeu_, int* nb_explo) {
     return resultat;
 }
 
-liste v4 (jeu jeu_, int* nb_explo) {
+liste v3 (jeu jeu_, int* nb_explo) {
     // initialisation random
     srand(time(NULL));
 
@@ -652,15 +652,15 @@ liste v_heuristique (jeu jeu_, int* nb_explo, void (*heuristique)(liste, tas_min
     return resultat;
 }
 
-liste v5 (jeu jeu_, int* nb_explo) {    
+liste v4 (jeu jeu_, int* nb_explo) {
     return v_heuristique(jeu_, nb_explo, heuristique1);
 }
 
-liste v6 (jeu jeu_, int* nb_explo) {
+liste v5 (jeu jeu_, int* nb_explo) {
     return v_heuristique(jeu_, nb_explo, heuristique2);
 }
 
-liste v7 (jeu jeu_, int* nb_explo) {
+liste v6 (jeu jeu_, int* nb_explo) {
     return v_heuristique(jeu_, nb_explo, heuristique3);
 }
 

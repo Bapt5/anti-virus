@@ -23,7 +23,7 @@
         - on utilise une brute force en essayant toutes les combinaisons de pièces
           à bouger
 */
-liste v1(jeu, int*);
+liste v0(jeu, int*);
 
 /**
     Paramètres:
@@ -38,7 +38,7 @@ liste v1(jeu, int*);
           à bouger
         - on stocke les grilles déjà vues dans une liste pour ne pas les revoir
 */
-liste v2(jeu, int*);
+liste v1(jeu, int*);
 
 /*
     Paramètres:
@@ -54,7 +54,7 @@ liste v2(jeu, int*);
         - on stocke les grilles déjà vues dans un arbre binaire (améliore la complexité) de recherche pour
           ne pas les revoir
 */
-liste v3(jeu, int*);
+liste v2(jeu, int*);
 
 /*
     Paramètres:
@@ -67,7 +67,7 @@ liste v3(jeu, int*);
     Méthode:
         - on choisi aléatoirement la pièce suivante à bouger
 */
-liste v4(jeu, int*);
+liste v3(jeu, int*);
 
 /*
     Paramètres:
@@ -81,7 +81,7 @@ liste v4(jeu, int*);
         - on utilise une file de priorité pour stocker les états du jeu 
             (priorité = distance pièce à sortir jusqu'à la sortie)
 */
-liste v5(jeu, int*);
+liste v4(jeu, int*);
 
 /*
     Paramètres:
@@ -95,7 +95,7 @@ liste v5(jeu, int*);
         - on utilise un tas min pour stocker les états du jeu 
             (priorité = nombre de pièces bloquant la pièce à sortir)
 */
-liste v6(jeu, int*);
+liste v5(jeu, int*);
 
 /*
     Paramètres:
@@ -109,5 +109,5 @@ liste v6(jeu, int*);
         - on utilise un tas min pour stocker les états du jeu 
             (priorité = nombre de pieces sur le chemin de la pièce à sortir)
 */
-liste v7(jeu, int*);
+liste v6(jeu, int*);
 #endif
