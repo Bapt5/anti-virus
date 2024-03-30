@@ -291,24 +291,29 @@ void envoyer_jeu_pieces(jeu jeu_, void* publisher) {
     */
 
     // on créé le message
-    // INFO: on suppose que le message ne dépasse pas 500 caractères
-    char message[500]; 
+    // 1ere ligne: grille taille nombre de pièces (20 caractères)
+    // 2e ligne: piece id taille pos1 pos2 ... ((20 + taille) caractères)
+    // 3e ligne: piece id taille pos1 pos2 ... ((20 + taille) caractères)
+    // ...
+    char* message = malloc(jeu_.taille * jeu_.nb_pieces * (20 + jeu_.taille * jeu_.taille) * sizeof(char)); 
 
     // grille taille nombre de pièces
     sprintf(message, "grille %d %d\n", jeu_.taille, jeu_.nb_pieces);
 
-    // on envoie la pièce à sortir en premier
-    formate_msg_piece(jeu_, jeu_.piece_a_sortir, &message);
+    // on ajoute la pièce à sortir en premier
+    formate_msg_piece(jeu_, jeu_.piece_a_sortir, message);
 
-    // on envoie les pièces
+    // on ajoute les pièces au message
     for (int i = 0; i < jeu_.nb_pieces; i += 1) {
         if (i != jeu_.piece_a_sortir) {
-            formate_msg_piece(jeu_, i, &message);
+            formate_msg_piece(jeu_, i, message);
         }
     }
 
     // printf("%s\n", message);
     zmq_send(publisher, message, strlen(message), 0);
+
+    free(message);
 }
 
 void affiche_jeu_python(jeu jeu_, void* publisher) {
