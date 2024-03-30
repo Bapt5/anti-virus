@@ -3,6 +3,7 @@
 #include "liste_chaine.h"
 
 #include "resolution.h"
+#include "creation.h"
 
 #include <time.h>
 
@@ -60,29 +61,57 @@ void test_fonction(char* nom_fonction, char* nom_jeu, liste(*f)(jeu, int*), jeu*
     printf("\n");
 }
 
+void tests_instances () {
+    for (int i = 1; i <= 60; i++) {
+        char* nom_fichier = malloc(100 * sizeof(char));
+        sprintf(nom_fichier, "instances/livret/defi%d", i);
+
+        jeu* jeu_ = creer_jeu(nom_fichier);
+
+        int nb_explo_v4 = 0;
+        int nb_explo_v5 = 0;
+        int nb_explo_v6 = 0;
+
+        printf("Test v4 sur %s: ", nom_fichier);
+        liste resultat_v4 = v4(*jeu_, &nb_explo_v4);
+        if (est_vide_liste(resultat_v4)) {
+            printf("Pas de solution\n");
+        } else {
+            printf("Solution en %d coups\n", longueur_liste(resultat_v4) - 1);
+        }
+        free_liste(resultat_v4, free_jeu);
+
+        printf("Test v5 sur %s: ", nom_fichier);
+        liste resultat_v5 = v5(*jeu_, &nb_explo_v5);
+        if (est_vide_liste(resultat_v5)) {
+            printf("Pas de solution\n");
+        } else {
+            printf("Solution en %d coups\n", longueur_liste(resultat_v5) - 1);
+        }
+        free_liste(resultat_v5, free_jeu);
+
+        printf("Test v6 sur %s: ", nom_fichier);
+        liste resultat_v6 = v6(*jeu_, &nb_explo_v6);
+        if (est_vide_liste(resultat_v6)) {
+            printf("Pas de solution\n");
+        } else {
+            printf("Solution en %d coups\n", longueur_liste(resultat_v6) - 1);
+        }
+        free_liste(resultat_v6, free_jeu);
+
+        free(jeu_);
+        free(nom_fichier);
+        printf("\n");
+
+        FILE* f = fopen("resultats.csv", "a");
+        fprintf(f, "defi%d,%d,%d,%d\n", i, nb_explo_v4, nb_explo_v5, nb_explo_v6);
+        fclose(f);
+    }
+}
+
 int main()
 {
-    bool affiche_solution = false;
-    int pause = 1;
-
-    /* STARTER 1 */
-    jeu* starter1 = creer_jeu("instances/starter1");
-
-    /* JUNIOR 17 */
-    jeu* junior17 = creer_jeu("instances/junior17");
-
-    /* WIZARD 60 */
-    jeu* wizard60 = creer_jeu("instances/wizard60");
-
-    /* EXPERT 33 */
-    jeu* expert33 = creer_jeu("instances/expert33");
-    // pas de sol : sortie piece verte 
-
-    // JUNIOR 14 pièce jaune sortie dès le départ
-
-    /* WIZARD 52 */
-    jeu* wizard52 = creer_jeu("instances/wizard52");
-
+    srand(time(NULL));
     void *context = zmq_ctx_new();
     void *publisher = zmq_socket(context, ZMQ_PUB);
     
@@ -92,82 +121,23 @@ int main()
         zmq_ctx_destroy(context);
         return 1;
     }
+    sleep(1);
 
-    // test_fonction("v1", "starter 1", v1, starter1, affiche_solution, pause, publisher);
-    // test_fonction("v2", "starter 1", v2, starter1, affiche_solution, pause, publisher);
-    // test_fonction("v3", "starter 1", v3, starter1, affiche_solution, pause, publisher);
-    // test_fonction("v4", "starter 1", v4, starter1, affiche_solution, pause, publisher);
-    test_fonction("v5", "starter 1", v5, starter1, affiche_solution, pause, publisher);
-    test_fonction("v6", "starter 1", v6, starter1, affiche_solution, pause, publisher);
-    // printf("\n");
+    // while (true)
+    // {
+        jeu* jeu_ = creation_jeu_random(13, 10);
 
-    // test_fonction("v1", "junior 17", v1, junior17, affiche_solution, pause, publisher);
-    // test_fonction("v2", "junior 17", v2, junior17, affiche_solution, pause, publisher);
-    // test_fonction("v3", "junior 17", v3, junior17, affiche_solution, pause, publisher);
-    // test_fonction("v4", "junior 17", v4, junior17, affiche_solution, pause, publisher);
-    test_fonction("v5", "junior 17", v5, junior17, affiche_solution, pause, publisher);
-    test_fonction("v6", "junior 17", v6, junior17, affiche_solution, pause, publisher);
-    // printf("\n");
+        jeu* mjeu = melanger_jeu(jeu_, 1000);
 
-    // test_fonction("v1", "wizard 60", v1, wizard60, affiche_solution, pause, publisher);
-    // test_fonction("v2", "wizard 60", v2, wizard60, affiche_solution, pause, publisher);
-    // test_fonction("v3", "wizard 60", v3, wizard60, affiche_solution, pause, publisher);
-    // test_fonction("v4", "wizard 60", v4, wizard60, affiche_solution, pause, publisher);
-    test_fonction("v5", "wizard 60", v5, wizard60, affiche_solution, pause, publisher);
-    test_fonction("v6", "wizard 60", v6, wizard60, affiche_solution, pause, publisher);
-    // printf("\n");
+        affiche_jeu_python(*jeu_, publisher);
+        sleep(1);
+        affiche_jeu_python(*mjeu, publisher);
+        sleep(1);
 
-    // test_fonction("v1", "expert 33", v1, expert33, affiche_solution, pause, publisher);
-    // test_fonction("v2", "expert 33", v2, expert33, affiche_solution, pause, publisher);
-    // test_fonction("v3", "expert 33", v3, expert33, affiche_solution, pause, publisher);
-    // test_fonction("v4", "expert 33", v4, expert33, affiche_solution, pause, publisher);
-    // test_fonction("v5", "expert 33", v5, expert33, affiche_solution, pause, publisher);
-    // test_fonction("v6", "expert 33", v6, expert33, affiche_solution, pause, publisher);
-    // printf("\n");
+        test_fonction("v4", "jeu", v4, mjeu, true, 1, publisher);
 
-    // test_fonction("v1", "wizard 52", v1, wizard52, affiche_solution, pause, publisher);
-    // test_fonction("v2", "wizard 52", v2, wizard52, affiche_solution, pause, publisher);
-    // test_fonction("v3", "wizard 52", v3, wizard52, affiche_solution, pause, publisher);
-    // test_fonction("v4", "wizard 52", v4, wizard52, affiche_solution, pause, publisher);
-    test_fonction("v5", "wizard 52", v5, wizard52, affiche_solution, pause, publisher);
-    test_fonction("v6", "wizard 52", v6, wizard52, affiche_solution, pause, publisher);
-
-
-
-    // TEST ALEATOIRE SUR PLUSIEURS RESOLUTIONS
-    // test_fonction("v3", "wizard 60", v3, wizard60, publisher);
-
-    // double temps_total = 0;
-
-    // printf("Test v4 sur wizard 60: \n");
-
-    // const int nb_essais = 25;
-
-    // for (int i = 0; i < nb_essais; i++) {
-    //     clock_t debut = clock();
-    //     liste resultat = v4(*wizard60);
-    //     clock_t fin = clock();
-
-    //     printf("Solution en %d coups\n", longueur_liste(resultat) - 1);
-
-    //     double temps_execution = (double)(fin - debut) / CLOCKS_PER_SEC;
-    //     printf("Temps d'exécution %f s\n\n", temps_execution);
-
-    //     temps_total = temps_total + temps_execution;
-
-    //     free_liste(resultat, free_jeu);
+        free_jeu(jeu_);
+        free_jeu(mjeu);
     // }
 
-    // printf("Temps d'exécution moyen %f s\n", temps_total / nb_essais);
-
-    zmq_close(publisher);
-    zmq_ctx_destroy(context);
-
-    free_jeu(starter1);
-    free_jeu(junior17);
-    free_jeu(wizard60);
-    free_jeu(expert33);
-    free_jeu(wizard52);
-
-    return 0;
 }

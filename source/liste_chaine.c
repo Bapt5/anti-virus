@@ -54,7 +54,7 @@ int longueur_liste(liste l){
 
 void affiche_liste_aux(liste l) {
 	int* valeur = tete_liste(l);
-	printf("%d", *valeur);
+	printf("%p", valeur);
 
     if (!est_vide_liste(l->suivant)) {
         printf(", ");
@@ -115,4 +115,15 @@ liste copie_liste (liste l, void* (*copie_valeur)(void*)){
 	liste l_copie = inverser_liste(l_inv, NULL);
 	free_liste(l_inv, NULL);
 	return l_copie;
+}
+
+void* i_ieme_element_liste(liste l, int i){
+	assert(i >= 0);
+
+	if (i == 0){
+		return tete_liste(l);
+	}
+	else{
+		return i_ieme_element_liste(queue_liste(l), i-1);
+	}
 }

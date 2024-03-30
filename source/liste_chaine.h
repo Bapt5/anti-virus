@@ -132,8 +132,36 @@ void affiche_liste(liste);
 */
 liste concatener_liste(liste,liste);
 
+/** fonction : appartient_liste
+	- entrée : une liste "l" (type liste), un pointeur "elt" et une fonction de comparaison "comp" (type bool (*)(void*, void*))
+	- précondition :  rien
+	- sortie : booléen (true si elt est dans la liste, false sinon)
+	- postcondition : "l" non-modifiée
+*/
 bool appartient_liste(void*, liste, bool (*)(void*, void*));
+
+/** fonction : inverser_liste
+	- entrée : une liste "l" (type liste) et une fonction de copie "copie_valeur" (type void* (*)(void*))
+	- précondition :  rien
+	- sortie : nouvelle liste contenant les éléments de "l" dans l'ordre inverse
+	- postcondition : "l" non-modifiée
+*/
 liste inverser_liste(liste l, void* (*copie_valeur)(void*));
+
+/** fonction : copie_liste
+	- entrée : une liste "l" (type liste) et une fonction de copie "copie_valeur" (type void* (*)(void*))
+	- précondition :  rien
+	- sortie : nouvelle liste contenant les éléments de "l" copiés
+	- postcondition : "l" non-modifiée
+*/
 liste copie_liste(liste l, void* (*copie_valeur)(void*));
+
+/** fonction : i_ieme_element_liste
+	- entrée : une liste "l" (type liste) et un entier "i" positif
+	- précondition :  rien
+	- sortie : l'élément d'indice "i" dans "l"
+	- postcondition : "l" non-modifiée
+*/
+void* i_ieme_element_liste(liste l, int i);
 
 #endif
