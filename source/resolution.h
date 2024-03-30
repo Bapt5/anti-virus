@@ -8,6 +8,7 @@
 #include "file.h"
 #include "abr.h"
 #include "tas_min.h"
+#include "recherche.h"
 
 #include <time.h>
 
