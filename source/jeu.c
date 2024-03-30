@@ -392,6 +392,25 @@ bool est_resolu (jeu jeu_) {
     return piece_a_sortir != NULL && piece_a_sortir->pos.i == jeu_.sortie.i && piece_a_sortir->pos.j == jeu_.sortie.j;
 }
 
+unsigned long long hash_jeu(jeu jeu_) {
+    unsigned long long hashValue = 0;
+    unsigned long long exp = 1;
+
+    unsigned long long base = (unsigned long long)jeu_.taille;
+
+    for (int i = 0; i < jeu_.nb_pieces; i++) {
+        piece* p = jeu_.pieces[jeu_.id_pieces[i]];
+
+        hashValue += exp * (unsigned long long)p->pos.i;
+        exp *= base;
+
+        hashValue += exp * (unsigned long long)p->pos.j;
+        exp *= base;
+    }
+
+    return hashValue;
+}
+
 void melanger_pieces_jeu (jeu* jeu_) {
     int n = jeu_->nb_pieces;
 

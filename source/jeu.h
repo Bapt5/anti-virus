@@ -122,6 +122,15 @@ bool est_valide_jeu(jeu);
 
 /**
     Paramètres:
+        - jeu_: le jeu
+    
+    Retourne:
+        - un entier représentant le hash du jeu
+*/ 
+unsigned long long hash_jeu(jeu);
+
+/**
+    Paramètres:
         - jeu_: jeu
 
     Mélange les pièces du jeu

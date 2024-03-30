@@ -43,33 +43,6 @@ liste v0 (jeu jeu_, int* nb_explo) {
     return resultat;
 }
 
-unsigned long long hash_jeu(jeu jeu_) {
-    /*
-    Paramètres:
-        - jeu_: le jeu
-    
-    Retourne:
-        - un entier représentant le hash du jeu
-    */ 
-
-    unsigned long long hashValue = 0;
-    unsigned long long exp = 1;
-
-    unsigned long long base = (unsigned long long)jeu_.taille;
-
-    for (int i = 0; i < jeu_.nb_pieces; i++) {
-        piece* p = jeu_.pieces[jeu_.id_pieces[i]];
-
-        hashValue += exp * (unsigned long long)p->pos.i;
-        exp *= base;
-
-        hashValue += exp * (unsigned long long)p->pos.j;
-        exp *= base;
-    }
-
-    return hashValue;
-}
-
 liste v1 (jeu jeu_, int* nb_explo) {
     liste resultat = creer_liste();
 
