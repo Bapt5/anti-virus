@@ -56,39 +56,30 @@ void position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, 
         assert(jeu_.pieces[jeu_.id_pieces[id_pieces[i] - 1]]->bougeable);
     }
 
-    jeu* jeu_copie = copie_jeu(&jeu_);
-
-    for (int i = 1; i < jeu_.taille; i += 1) {
-        for (int k = 0; k < n; k += 1) {
-            if (dir == HAUT) {
-                jeu_copie->pieces[jeu_copie->id_pieces[id_pieces[k] - 1]]->pos.i -= 1;
-            } else if (dir == BAS) {
-                jeu_copie->pieces[jeu_copie->id_pieces[id_pieces[k] - 1]]->pos.i += 1;
-            } else if (dir == GAUCHE) {
-                jeu_copie->pieces[jeu_copie->id_pieces[id_pieces[k] - 1]]->pos.j -= 1;
-            } else if (dir == DROITE) {
-                jeu_copie->pieces[jeu_copie->id_pieces[id_pieces[k] - 1]]->pos.j += 1;
-            }
+    jeu* jeu_test = copie_jeu(&jeu_);
+    for (int k = 0; k < n; k += 1) {
+        if (dir == HAUT) {
+            jeu_test->pieces[jeu_test->id_pieces[id_pieces[k] - 1]]->pos.i -= 1;
+        } else if (dir == BAS) {
+            jeu_test->pieces[jeu_test->id_pieces[id_pieces[k] - 1]]->pos.i += 1;
+        } else if (dir == GAUCHE) {
+            jeu_test->pieces[jeu_test->id_pieces[id_pieces[k] - 1]]->pos.j -= 1;
+        } else if (dir == DROITE) {
+            jeu_test->pieces[jeu_test->id_pieces[id_pieces[k] - 1]]->pos.j += 1;
         }
-
-        if (est_valide_jeu(*jeu_copie)) {
-            jeu* jeu2 = copie_jeu(jeu_copie);
-
-            ajout(ajouter_tete_liste(jeu2, copie_liste(path, copie_jeu)), f);
-        } else {
-            break;
-        }
-
     }
 
-    free_jeu(jeu_copie);
+    if (est_valide_jeu(*jeu_test)) {
+        ajout(ajouter_tete_liste(jeu_test, copie_liste(path, copie_jeu)), f);
+    } else {
+        free_jeu(jeu_test);
+    }
 }
 
 void position_accessible (jeu jeu_, int n, int id_pieces[n], void* f, void (*ajout)(void*, void*), liste path) {
     for (int dir = 0; dir < 4; dir += 1) {
         position_accessible_dir(jeu_, n, id_pieces, dir, f, ajout, path);
-    }
-    
+    } 
 }
 
 void bouge_voisins (jeu jeu_, int id_piece, void* f, void (*ajout)(void*, void*), liste path) {
