@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.c": "c",
         "main.c": "c",
         "system_error": "c",
         "piece.h": "c",
