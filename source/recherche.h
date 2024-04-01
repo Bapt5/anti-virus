@@ -76,7 +76,7 @@ void position_accessible (jeu jeu_, int n, int id_pieces[n], void* f, void (*ajo
 
     Ajoute à f les grilles accessibles en bougeant les voisins de la pièce id_piece
 */
-void bouger_voisins (jeu jeu_, int id_piece, void* f, void (*ajout)(void*, void*), liste path);
+void bouge_voisins (jeu jeu_, int id_piece, void* f, void (*ajout)(void*, void*), liste path);
 
 
 #endif
