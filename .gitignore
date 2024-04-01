@@ -54,3 +54,7 @@ dkms.conf
 # Data
 *.csv
 data/*
+
+# instances
+instances/*
+!instances/livret
