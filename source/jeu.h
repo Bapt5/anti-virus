@@ -56,6 +56,14 @@ jeu* creer_jeu(char*);
 /**
     Paramètres:
         - jeu_: jeu
+        - filename: nom du fichier
+    Exporte le jeu dans le fichier
+*/
+void export_jeu(jeu, char*);
+
+/**
+    Paramètres:
+        - jeu_: jeu
     
     Affiche le jeu dans le terminal
 */

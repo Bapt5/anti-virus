@@ -221,6 +221,33 @@ jeu* creer_jeu(char* filename) {
     return jeu_;
 }
 
+void export_jeu(jeu jeu_, char* filename) {
+    FILE* fichier = fopen(filename, "w");
+    assert(fichier != NULL);
+
+    fprintf(fichier, "%d\n", jeu_.taille);
+    fprintf(fichier, "%d\n", jeu_.nb_pieces);
+    fprintf(fichier, "%d %d\n", jeu_.sortie.i, jeu_.sortie.j);
+    fprintf(fichier, "%d\n", jeu_.piece_a_sortir);
+
+    int** grille = construire_grille(jeu_);
+
+    for (int i = 0; i < jeu_.taille; i += 1) {
+
+        for (int j = 0; j < jeu_.taille; j += 1) {
+            if (grille[i][j] != -1){
+                fprintf(fichier, "%d ", grille[i][j]);
+            }
+        }
+
+        fprintf(fichier, "\n");
+    }
+
+    free_grille(jeu_, grille);
+
+    fclose(fichier);
+}
+
 void affiche_jeu(jeu jeu_) {
     int** grille = construire_grille(jeu_);
 
