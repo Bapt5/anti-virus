@@ -108,7 +108,7 @@ liste v5(jeu, int*);
 
     Méthode:
         - on utilise un tas min pour stocker les états du jeu 
-            (priorité = nombre de pieces sur le chemin de la pièce à sortir)
+            (priorité = nombre de pieces plus proche de la sortie que la pièce à sortir)
 */
 liste v6(jeu, int*);
 #endif

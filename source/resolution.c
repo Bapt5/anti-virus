@@ -1,4 +1,5 @@
 #include "resolution.h"
+
 liste v0 (jeu jeu_, int* nb_explo) {
     liste resultat = creer_liste();
 
