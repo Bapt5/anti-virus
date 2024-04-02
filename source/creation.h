@@ -27,10 +27,12 @@ jeu* creation_jeu_random(int taille, int nb_pieces);
 /**
     Paramètres:
         - j: un pointeur vers un jeu
+        - nb_coups: le nombre de coups à effectuer
+        - timeout: le temps maximum pour mélanger le jeu
     Postconditions:
         - bouge les pièces sur la grille de manière aléatoire
 */
-jeu* melanger_jeu(jeu* j, int nb_coups);
+jeu* melanger_jeu(jeu* j, int nb_coups, int timeout);
 
 
 #endif

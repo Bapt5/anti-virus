@@ -32,6 +32,29 @@ typedef struct piece_s piece;
 
 /**
     Paramètres:
+        taille: taille de la pièce
+        positions_rel: tableau des positions relatives de la pièce
+        bougeable: true si la pièce est bougeable, false sinon
+
+    Retourne:
+        - une pièce de taille taille avec les positions relatives positions_rel
+        et bougeable si bougeable est true
+        - la position n'est pas initialisée
+*/
+piece* creer_piece (int, position*, bool);
+
+/**
+    Paramètres:
+        p: pointeur vers la pièce à tourner
+        angle: angle de rotation (90° par angle)
+
+    Retourne:
+        - une pièce tournée de angle*90° par rapport à la pièce p
+*/
+piece* rotation_piece (piece*, int);
+
+/**
+    Paramètres:
         p: pointeur vers la pièce à libérer
 
     Libère la mémoire allouée à la pièce
