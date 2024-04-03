@@ -20,6 +20,7 @@
     Retourne:
         - un jeu aléatoire de taille taille avec nb_pieces pièces 
         la pièce à sortir est à la sortie du jeu
+        - NULL si une allocation a échoué
         
 */
 jeu* creation_jeu_random(int taille, int nb_pieces);
@@ -31,6 +32,8 @@ jeu* creation_jeu_random(int taille, int nb_pieces);
         - timeout: le temps maximum pour mélanger le jeu
     Postconditions:
         - bouge les pièces sur la grille de manière aléatoire
+        - retourne le jeu mélangé
+        - NULL si une allocation a échoué
 */
 jeu* melanger_jeu(jeu* j, int nb_coups, int timeout);
 

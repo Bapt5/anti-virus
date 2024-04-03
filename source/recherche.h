@@ -25,19 +25,23 @@ typedef enum Direction_e Direction;
         - deja_mise: un tableau de booléens de taille jeu_.nb_pieces
             indiquant si la pièce correspondante a déjà été mise dans la liste
 
+    Retourne:
+        - true si on a pu ajouter les id des pièces voisines à l, false sinon
+
     Ajoute à l les id des pièces voisines de la pièce id_piece dans la direction dir
 */
-void voisins_piece_dir (jeu jeu_, int id_piece, Direction dir, liste* l, bool* deja_mise);
+bool voisins_piece_dir (jeu jeu_, int id_piece, Direction dir, liste* l, bool* deja_mise);
 
 /*
     Paramètres:
         - jeu_: le jeu
         - id_piece: l'id de la pièce dont on veut les voisins
+        - succes: un pointeur vers un booléen qui sera mis à true si tout s'est bien passé
 
     Retourne:
         - une liste d'entiers contenant les id des pièces voisines de la pièce id_piece
 */
-liste voisins_piece (jeu jeu_, int id_piece);
+liste voisins_piece (jeu jeu_, int id_piece, bool* succes);
 
 /* 
     Paramètres:
@@ -49,10 +53,13 @@ liste voisins_piece (jeu jeu_, int id_piece);
         - ajout: la fonction pour ajouter un élément à f
         - path: le chemin menant à la grille actuelle
 
+    Retourne:
+        - true si on a pu ajouter les grilles accessibles à f, false sinon
+
     Ajoute à f les grilles accessibles en bougeant les pièces
         id_pieces[0], ..., id_pieces[n - 1] dans la direction dir
 */
-void position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, void* f, void (*ajout)(void*, void*), liste path);
+bool position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, void* f, bool (*ajout)(void*, void*), liste path);
 
 /*
     Paramètres: 
@@ -62,9 +69,13 @@ void position_accessible_dir (jeu jeu_, int n, int id_pieces[n], Direction dir, 
         - f: la file dans laquelle on va ajouter les grilles accessibles
         - ajout: la fonction pour ajouter un élément à f
         - path: le chemin menant à la grille actuelle
+
+    Retourne: 
+        - true si on a pu ajouter les grilles accessibles à f, false sinon
+
     Ajoute à f les grilles accessibles en bougeant les pièces id_pieces[0], ..., id_pieces[n - 1]
 */
-void position_accessible (jeu jeu_, int n, int id_pieces[n], void* f, void (*ajout)(void*, void*), liste path);
+bool position_accessible (jeu jeu_, int n, int id_pieces[n], void* f, bool (*ajout)(void*, void*), liste path);
 
 /*
     Paramètres:
@@ -74,9 +85,12 @@ void position_accessible (jeu jeu_, int n, int id_pieces[n], void* f, void (*ajo
         - ajout: la fonction pour ajouter un élément à f
         - path: le chemin menant à la grille actuelle
 
+    Retourne:
+        - true si on a pu ajouter les grilles accessibles à f, false sinon
+
     Ajoute à f les grilles accessibles en bougeant les voisins de la pièce id_piece
 */
-void bouge_voisins (jeu jeu_, int id_piece, void* f, void (*ajout)(void*, void*), liste path);
+bool bouge_voisins (jeu jeu_, int id_piece, void* f, bool (*ajout)(void*, void*), liste path);
 
 
 #endif

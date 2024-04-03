@@ -40,6 +40,7 @@ typedef struct piece_s piece;
         - une pièce de taille taille avec les positions relatives positions_rel
         et bougeable si bougeable est true
         - la position n'est pas initialisée
+        - NULL si une allocation a échoué
 */
 piece* creer_piece (int, position*, bool);
 
@@ -50,6 +51,7 @@ piece* creer_piece (int, position*, bool);
 
     Retourne:
         - une pièce tournée de angle*90° par rapport à la pièce p
+        - NULL si une allocation a échoué
 */
 piece* rotation_piece (piece*, int);
 
@@ -67,6 +69,7 @@ void free_piece (piece*);
 
     Retourne:
         - un pointeur vers une copie de la pièce p
+        - NULL si une allocation a échoué
 */
 piece* copie_piece (piece*);
 

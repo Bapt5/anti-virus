@@ -7,7 +7,30 @@ liste v0 (jeu jeu_, int* nb_explo) {
 
     jeu* g_copie = copie_jeu(&jeu_);
 
-    enfiler(ajouter_tete_liste(g_copie, resultat), &f);
+    if (g_copie == NULL) {  // Si l'allocation a échoué on libère la mémoire et on arrête la fonction
+        free_liste(resultat, free_jeu);
+        free_file(&f, free_liste);
+
+        return 1;
+    }
+
+    liste path_i = ajouter_tete_liste(g_copie, resultat);
+
+    if (path_i == NULL) {  // Si l'ajout a échoué on libère la mémoire et on arrête la fonction
+        free_jeu(g_copie);
+        free_liste(resultat, free_jeu);
+        free_file(&f, free_liste);
+
+        return 1;
+    }
+
+    if (!enfiler(path_i, &f)) {  // Si l'ajout a échoué on libère la mémoire et on arrête la fonction
+        free_jeu(g_copie);
+        free_liste(resultat, free_jeu);
+        free_file(&f, free_liste);
+
+        return 1;
+    }
 
     while (!est_vide_file(f)) {
         liste path = defiler(&f);
@@ -18,16 +41,44 @@ liste v0 (jeu jeu_, int* nb_explo) {
         // affiche_jeu(*jeu2);
 
         if (est_resolu(*jeu2)) {
-            resultat = inverser_liste(path, NULL);
+            bool succes = true;
+            resultat = inverser_liste(path, NULL, &succes);
+
+            if (!succes) {
+                free_liste(path, free_jeu);
+                while (!est_vide_file(f)) {
+                    free_liste(defiler(&f), free_jeu);
+                }
+
+                free_liste(resultat, free_jeu);
+                return 1;
+            }
 
             free_liste(path, NULL);
             break;
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
                 if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
-                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path);
+                    
+                    if (!position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path)) {
+                        free_liste(path, free_jeu);
+                        while (!est_vide_file(f)) {
+                            free_liste(defiler(&f), free_jeu);
+                        }
 
-                    bouge_voisins(*jeu2, id_piece, &f, enfiler, path);
+                        free_liste(resultat, free_jeu);
+                        return 1;
+                    }
+
+                    if (!bouge_voisins(*jeu2, id_piece, &f, enfiler, path)) {
+                        free_liste(path, free_jeu);
+                        while (!est_vide_file(f)) {
+                            free_liste(defiler(&f), free_jeu);
+                        }
+
+                        free_liste(resultat, free_jeu);
+                        return 1;
+                    }
                 }
             }
 
@@ -53,7 +104,32 @@ liste v1 (jeu jeu_, int* nb_explo) {
 
     jeu* g_copie = copie_jeu(&jeu_);
 
-    enfiler(ajouter_tete_liste(g_copie, resultat), &f);
+    if (g_copie == NULL) {  // Si l'allocation a échoué on libère la mémoire et on arrête la fonction
+        free_liste(resultat, free_jeu);
+        free_liste(vus, free);
+        free_file(&f, free_liste);
+
+        return 1;
+    }
+
+    liste path_i = ajouter_tete_liste(g_copie, resultat);
+
+    if (path_i == NULL) {  // Si l'ajout a échoué on libère la mémoire et on arrête la fonction
+        free_jeu(g_copie);
+        free_liste(resultat, free_jeu);
+        free_liste(vus, free);
+        free_file(&f, free_liste);
+
+        return 1;
+    }
+
+    if(!enfiler(path_i, &f)) {  // Si l'ajout a échoué on libère la mémoire et on arrête la fonction
+        free_jeu(g_copie);
+        free_liste(resultat, free_jeu);
+        free_liste(vus, free);
+
+        return 1;
+    }
 
     while (!est_vide_file(f)) {
         liste path = defiler(&f);
@@ -73,23 +149,82 @@ liste v1 (jeu jeu_, int* nb_explo) {
         // affiche_jeu(*jeu2);
 
         if (est_resolu(*jeu2)) {
-            resultat = inverser_liste(path, NULL);
+            bool succes = true;
+            resultat = inverser_liste(path, NULL, &succes);
+
+            if (!succes) {
+                free_liste(path, free_jeu);
+                free_liste(vus, free);
+                while (!est_vide_file(f)) {
+                    free_liste(defiler(&f), free_jeu);
+                }
+
+                free_liste(resultat, free_jeu);
+
+                return 1;
+            }
 
             free_liste(path, NULL);
             break;
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
                 if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
-                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path);
+                    if (!position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path)) {
+                        free_liste(path, free_jeu);
+                        free_liste(vus, free);
+                        while (!est_vide_file(f)) {
+                            free_liste(defiler(&f), free_jeu);
+                        }
 
-                    bouge_voisins(*jeu2, id_piece, &f, enfiler, path);
+                        free_liste(resultat, free_jeu);
+
+                        return 1;
+                    }
+
+                    if (!bouge_voisins(*jeu2, id_piece, &f, enfiler, path)) {
+                        free_liste(path, free_jeu);
+                        free_liste(vus, free);
+                        while (!est_vide_file(f)) {
+                            free_liste(defiler(&f), free_jeu);
+                        }
+
+                        free_liste(resultat, free_jeu);
+
+                        return 1;
+                    }
                 }
             }
 
             // on marque comme vu cette grille
             unsigned long long* hash_p = malloc(sizeof(unsigned long long));
+            
+            if (hash_p == NULL) {  // Si l'allocation a échoué on libère la mémoire et on arrête la fonction
+                free_liste(vus, free);
+                free_liste(path, free_jeu);
+
+                while (!est_vide_file(f)) {
+                    free_liste(defiler(&f), free_jeu);
+                }
+
+                free_liste(resultat, free_jeu);
+
+                return 1;
+            }
+
             *hash_p = hash;
             vus = ajouter_tete_liste(hash_p, vus);
+            if (vus == NULL) {  // Si l'ajout a échoué on libère la mémoire et on arrête la fonction
+                free_liste(vus, free);
+                free_liste(path, free_jeu);
+
+                while (!est_vide_file(f)) {
+                    free_liste(defiler(&f), free_jeu);
+                }
+
+                free_liste(resultat, free_jeu);
+
+                return 1;
+            }
         }
 
         free_liste(path, free_jeu);
@@ -109,11 +244,41 @@ liste v2 (jeu jeu_, int* nb_explo) {
 
     abr vus = creer_abr();
 
+    if (vus == NULL) {  // Si l'allocation a échoué on arrête la fonction
+        return 1;
+    }
+
     file f = creer_file();
 
     jeu* g_copie = copie_jeu(&jeu_);
 
-    enfiler(ajouter_tete_liste(g_copie, resultat), &f);
+    if (g_copie == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_abr(vus);
+        free_liste(resultat, free_jeu);
+        free_file(&f, free_liste);
+
+        return 1;
+    }
+
+    liste path_i = ajouter_tete_liste(g_copie, resultat);
+
+    if (path_i == NULL) {  // Si l'ajout a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_jeu(g_copie);
+        free_liste(resultat, free_jeu);
+        free_abr(vus);
+        free_file(&f, free_liste);
+
+        return 1;
+    }
+
+    if(!enfiler(path_i, &f)) {  // Si l'ajout a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_jeu(g_copie);
+        free_liste(resultat, free_jeu);
+        free_abr(vus);
+        free_file(&f, free_liste);
+
+        return 1;
+    }
 
     while (!est_vide_file(f)) {
         liste path = defiler(&f);
@@ -133,7 +298,20 @@ liste v2 (jeu jeu_, int* nb_explo) {
         // affiche_jeu(*jeu2);
 
         if (est_resolu(*jeu2)) {
-            resultat = inverser_liste(path, NULL);
+            bool succes = true;
+            resultat = inverser_liste(path, NULL, &succes);
+
+            if (!succes) {
+                free_liste(path, free_jeu);
+                while (!est_vide_file(f)) {
+                    free_liste(defiler(&f), free_jeu);
+                }
+
+                free_liste(resultat, free_jeu);
+                free_abr(vus);
+
+                return 1;
+            }
 
             free_liste(path, NULL);
             break;
@@ -142,14 +320,44 @@ liste v2 (jeu jeu_, int* nb_explo) {
                 int profondeur = longueur_liste(path) - 1;
 
                 if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
-                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path);
+                    if (!position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path)) {
+                        free_liste(path, free_jeu);
+                        while (!est_vide_file(f)) {
+                            free_liste(defiler(&f), free_jeu);
+                        }
 
-                    bouge_voisins(*jeu2, id_piece, &f, enfiler, path);
+                        free_liste(resultat, free_jeu);
+                        free_abr(vus);
+
+                        return 1;
+                    }
+
+                    if (!bouge_voisins(*jeu2, id_piece, &f, enfiler, path)) {
+                        free_liste(path, free_jeu);
+                        while (!est_vide_file(f)) {
+                            free_liste(defiler(&f), free_jeu);
+                        }
+
+                        free_liste(resultat, free_jeu);
+                        free_abr(vus);
+
+                        return 1;
+                    }
                 }
             }
 
             // on marque comme vu cette grille
-            ajouter_abr(&vus, hash);
+            if (!ajouter_abr(&vus, hash)) {
+                free_liste(path, free_jeu);
+                while (!est_vide_file(f)) {
+                    free_liste(defiler(&f), free_jeu);
+                }
+
+                free_liste(resultat, free_jeu);
+                free_abr(vus);
+
+                return 1;
+            }
         }
 
         free_liste(path, free_jeu);
@@ -172,11 +380,43 @@ liste v3 (jeu jeu_, int* nb_explo) {
 
     abr vus = creer_abr();
 
+    if (vus == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_liste(resultat, free_jeu);
+
+        return 1;
+    }
+
     file f = creer_file();
 
     jeu* g_copie = copie_jeu(&jeu_);
 
-    enfiler(ajouter_tete_liste(g_copie, resultat), &f);
+    if (g_copie == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_abr(vus);
+        free_liste(resultat, free_jeu);
+        free_file(&f, free_liste);
+
+        return 1;
+    }
+
+    liste path_i = ajouter_tete_liste(g_copie, resultat);
+
+    if (path_i == NULL) {  // Si l'ajout a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_jeu(g_copie);
+        free_liste(resultat, free_jeu);
+        free_abr(vus);
+        free_file(&f, free_liste);
+
+        return 1;
+    }
+
+    if(!enfiler(path_i, &f)) {  // Si l'ajout a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_jeu(g_copie);
+        free_liste(resultat, free_jeu);
+        free_abr(vus);
+        free_file(&f, free_liste);
+
+        return 1;
+    }
 
     while (!est_vide_file(f)) {
         liste path = defiler(&f);
@@ -196,7 +436,20 @@ liste v3 (jeu jeu_, int* nb_explo) {
         // affiche_jeu(*jeu2);
 
         if (est_resolu(*jeu2)) {
-            resultat = inverser_liste(path, NULL);
+            bool succes = true;
+            resultat = inverser_liste(path, NULL, &succes);
+
+            if (!succes) {
+                free_liste(path, free_jeu);
+                while (!est_vide_file(f)) {
+                    free_liste(defiler(&f), free_jeu);
+                }
+
+                free_liste(resultat, free_jeu);
+                free_abr(vus);
+
+                return 1;
+            }
 
             free_liste(path, NULL);
             break;
@@ -209,14 +462,44 @@ liste v3 (jeu jeu_, int* nb_explo) {
                 int id_piece = p->id;
 
                 if (p->bougeable) {
-                    position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path);
+                    if (!position_accessible(*jeu2, 1, (int[]){id_piece}, &f, enfiler, path)) {
+                        free_liste(path, free_jeu);
+                        while (!est_vide_file(f)) {
+                            free_liste(defiler(&f), free_jeu);
+                        }
 
-                    bouge_voisins(*jeu2, id_piece, &f, enfiler, path);
+                        free_liste(resultat, free_jeu);
+                        free_abr(vus);
+
+                        return 1;
+                    }
+
+                    if (!bouge_voisins(*jeu2, id_piece, &f, enfiler, path)) {
+                        free_liste(path, free_jeu);
+                        while (!est_vide_file(f)) {
+                            free_liste(defiler(&f), free_jeu);
+                        }
+
+                        free_liste(resultat, free_jeu);
+                        free_abr(vus);
+
+                        return 1;
+                    }
                 }
             }
 
             // on marque comme vu cette grille
-            ajouter_abr(&vus, hash);
+            if (!ajouter_abr(&vus, hash)) {
+                free_liste(path, free_jeu);
+                while (!est_vide_file(f)) {
+                    free_liste(defiler(&f), free_jeu);
+                }
+
+                free_liste(resultat, free_jeu);
+                free_abr(vus);
+
+                return 1;
+            }
         }
 
         free_liste(path, free_jeu);
@@ -245,11 +528,13 @@ int distance (position p1, position p2) {
     return (p1.i - p2.i) * (p1.i - p2.i) + (p1.j - p2.j) * (p1.j - p2.j);
 }
 
-void heuristique1 (liste path, tas_min* tas) {
+bool heuristique1 (liste path, tas_min* tas) {
     /*
     Paramètres:
         - path: le chemin menant à la grille
         - tas: le tas dans lequel on va ajouter la grille
+    Retournes:
+        - true si l'ajout a réussi, false sinon
     
     Ajoute à tas la grille à la fin de path avec une priorité égale à 
     la distance entre la pièce à sortir et la sortie
@@ -261,10 +546,14 @@ void heuristique1 (liste path, tas_min* tas) {
 
     int d = distance(piece_a_sortir->pos, jeu_->sortie);
 
-    inserer_tas_min(path, d, tas);
+    if (!inserer_tas_min(path, d, tas)) {
+        return false;
+    }
+
+    return true;
 }
 
-void heuristique2 (liste path, tas_min* tas) {
+bool heuristique2 (liste path, tas_min* tas) {
     /*
     Paramètres:
         - path: le chemin menant à la grille
@@ -281,16 +570,18 @@ void heuristique2 (liste path, tas_min* tas) {
     liste l = creer_liste();
     bool* deja_mise = calloc(jeu_->nb_pieces, sizeof(bool));
 
+    bool succes = true;  // boolen pour savoir si l'ajout des voisins a réussi
+
     if (piece_a_sortir->pos.i > jeu_->sortie.i) {
-        voisins_piece_dir(*jeu_, piece_a_sortir->id, HAUT, &l, deja_mise);
+        succes = succes && voisins_piece_dir(*jeu_, piece_a_sortir->id, HAUT, &l, deja_mise);
     } else if (piece_a_sortir->pos.i < jeu_->sortie.i) {
-        voisins_piece_dir(*jeu_, piece_a_sortir->id, BAS, &l, deja_mise);
+        succes = succes && voisins_piece_dir(*jeu_, piece_a_sortir->id, BAS, &l, deja_mise);
     }
     
     if (piece_a_sortir->pos.j > jeu_->sortie.j) {
-        voisins_piece_dir(*jeu_, piece_a_sortir->id, GAUCHE, &l, deja_mise);
+        succes = succes && voisins_piece_dir(*jeu_, piece_a_sortir->id, GAUCHE, &l, deja_mise);
     } else if (piece_a_sortir->pos.j < jeu_->sortie.j) {
-        voisins_piece_dir(*jeu_, piece_a_sortir->id, DROITE, &l, deja_mise);
+        succes = succes && voisins_piece_dir(*jeu_, piece_a_sortir->id, DROITE, &l, deja_mise);
     }
 
     int nb_bloquants = longueur_liste(l);
@@ -298,10 +589,14 @@ void heuristique2 (liste path, tas_min* tas) {
     free_liste(l, free);
     free(deja_mise);
 
-    inserer_tas_min(path, nb_bloquants, tas);
+    if (!inserer_tas_min(path, nb_bloquants, tas) || !succes) {
+        return false;
+    }
+
+    return true;
 }
 
-void heuristique3 (liste path, tas_min* tas) {
+bool heuristique3 (liste path, tas_min* tas) {
     /*
     Paramètres:
         - path: le chemin menant à la grille
@@ -327,12 +622,15 @@ void heuristique3 (liste path, tas_min* tas) {
         }
     }
 
-    inserer_tas_min(path, prio, tas);
+    if(!inserer_tas_min(path, prio, tas)) {
+        return false;
+    }
 
+    return true;
 }
 
 
-liste v_heuristique (jeu jeu_, int* nb_explo, void (*heuristique)(liste, tas_min* tas)) {
+liste v_heuristique (jeu jeu_, int* nb_explo, bool (*heuristique)(liste, tas_min* tas)) {
     /*
     Paramètres:
         - jeu_: le jeu
@@ -347,12 +645,51 @@ liste v_heuristique (jeu jeu_, int* nb_explo, void (*heuristique)(liste, tas_min
 
     abr vus = creer_abr();
 
+    if (vus == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_liste(resultat, free_jeu);
+
+        return 1;
+    }
+
     int capacite_tas = jeu_.nb_pieces * jeu_.nb_pieces * jeu_.taille * jeu_.taille;
     tas_min tas = creer_tas_min(capacite_tas);
 
+    if (tas.capacite == 0) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_abr(vus);
+        free_liste(resultat, free_jeu);
+
+        return 1;
+    }
+
     jeu* g_copie = copie_jeu(&jeu_);
 
-    inserer_tas_min(ajouter_tete_liste(g_copie, resultat), 0, &tas);
+    if (g_copie == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_abr(vus);
+        free_liste(resultat, free_jeu);
+        free_tas_min(&tas, free_liste);
+
+        return 1;
+    }
+
+    liste path_i = ajouter_tete_liste(g_copie, resultat);
+
+    if (path_i == NULL) {  // Si l'ajout a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_jeu(g_copie);
+        free_liste(resultat, free_jeu);
+        free_abr(vus);
+        free_tas_min(&tas, free_liste);
+
+        return 1;
+    }
+
+    if(!inserer_tas_min(path_i, 0, &tas)) {  // Si l'ajout a échoué on libère la mémoire déjà allouée et on arrête la fonction
+        free_jeu(g_copie);
+        free_liste(resultat, free_jeu);
+        free_abr(vus);
+        free_tas_min(&tas, free_liste);
+
+        return 1;
+    }
 
     while (!est_vide_tas_min(tas)) {
         liste path = extraire_min_tas_min(&tas);
@@ -372,21 +709,64 @@ liste v_heuristique (jeu jeu_, int* nb_explo, void (*heuristique)(liste, tas_min
         // affiche_jeu(*jeu2);
 
         if (est_resolu(*jeu2)) {
-            resultat = inverser_liste(path, NULL);
+            bool succes = true;
+            resultat = inverser_liste(path, NULL, &succes);
+
+            if (!succes) {
+                free_liste(path, free_jeu);
+                while (!est_vide_tas_min(tas)) {
+                    free_liste(extraire_min_tas_min(&tas), free_jeu);
+                }
+
+                free_liste(resultat, free_jeu);
+                free_abr(vus);
+
+                return 1;
+            }
 
             free_liste(path, NULL);
             break;
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
                 if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
-                    position_accessible(*jeu2, 1, (int[]){id_piece}, &tas, heuristique, path);
+                    if (!position_accessible(*jeu2, 1, (int[]){id_piece}, &tas, heuristique, path)) {
+                        free_liste(path, free_jeu);
+                        while (!est_vide_tas_min(tas)) {
+                            free_liste(extraire_min_tas_min(&tas), free_jeu);
+                        }
 
-                    bouge_voisins(*jeu2, id_piece, &tas, heuristique, path);
+                        free_liste(resultat, free_jeu);
+                        free_abr(vus);
+
+                        return 1;
+                    }
+
+                    if (!bouge_voisins(*jeu2, id_piece, &tas, heuristique, path)) {
+                        free_liste(path, free_jeu);
+                        while (!est_vide_tas_min(tas)) {
+                            free_liste(extraire_min_tas_min(&tas), free_jeu);
+                        }
+
+                        free_liste(resultat, free_jeu);
+                        free_abr(vus);
+
+                        return 1;
+                    }
                 }
             }
 
             // on marque comme vu cette grille
-            ajouter_abr(&vus, hash);
+            if (!ajouter_abr(&vus, hash)) {
+                free_liste(path, free_jeu);
+                while (!est_vide_tas_min(tas)) {
+                    free_liste(extraire_min_tas_min(&tas), free_jeu);
+                }
+
+                free_liste(resultat, free_jeu);
+                free_abr(vus);
+
+                return 1;
+            }
         }
 
         free_liste(path, free_jeu);

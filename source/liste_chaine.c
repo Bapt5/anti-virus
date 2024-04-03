@@ -7,8 +7,10 @@ liste creer_liste(void){
 
 liste ajouter_tete_liste(void* c, liste l){
 	liste new_l = malloc(sizeof(maillon));
-    
-    assert(new_l != NULL);
+
+	if (new_l == NULL) {  // Si l'allocation a échoué on retourne NULL
+		return NULL;
+	}
 
     new_l->valeur = c;
     new_l->suivant = l;
@@ -95,13 +97,25 @@ bool appartient_liste(void* c, liste l, bool (*egales)(void*, void*)){
 	}
 }
 
-liste inverser_liste(liste l, void* (*copie_valeur)(void*)){
+liste inverser_liste(liste l, void* (*copie_valeur)(void*), bool* succes){
+	*succes = true;
+
 	liste rev_l = creer_liste();
 	while (!est_vide_liste(l)) {
 		if (copie_valeur != NULL) {
 			rev_l = ajouter_tete_liste(copie_valeur(tete_liste(l)), rev_l);
+			if (rev_l == NULL) {
+				free_liste(rev_l, NULL);
+				*succes = false;
+				return NULL;
+			}
 		} else {
 			rev_l = ajouter_tete_liste(tete_liste(l), rev_l);
+			if (rev_l == NULL) {
+				free_liste(rev_l, NULL);
+				*succes = false;
+				return NULL;
+			}
 		}
 
 		l = queue_liste(l);
@@ -110,9 +124,19 @@ liste inverser_liste(liste l, void* (*copie_valeur)(void*)){
 	return rev_l;
 }
 
-liste copie_liste (liste l, void* (*copie_valeur)(void*)){
-	liste l_inv = inverser_liste(l, copie_valeur);
-	liste l_copie = inverser_liste(l_inv, NULL);
+liste copie_liste (liste l, void* (*copie_valeur)(void*), bool* succes) {
+	*succes = true;
+
+	liste l_inv = inverser_liste(l, copie_valeur, succes);
+	if (!*succes) {
+		return NULL;
+	}
+
+	liste l_copie = inverser_liste(l_inv, NULL, succes);
+	if (!*succes) {
+		return NULL;
+	}
+
 	free_liste(l_inv, NULL);
 	return l_copie;
 }

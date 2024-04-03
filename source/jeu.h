@@ -23,6 +23,7 @@ typedef struct jeu_s jeu;
 
     Retourne:
         - grille du jeu
+        - NULL si l'allocation a échoué
 */
 int** construire_grille(jeu);
 
@@ -50,6 +51,7 @@ void free_grille(jeu, int**);
 
     Retourne:
         - l'instance de jeu décrit dans le fichier
+        - NULL si une allocation a échoué
 */
 jeu* creer_jeu(char*);
 
@@ -103,6 +105,7 @@ void free_jeu(jeu*);
 
     Retourne:
         - copie du jeu
+        - NULL si une allocation a échoué
 */
 jeu* copie_jeu(jeu*);
 
@@ -118,6 +121,7 @@ bool est_resolu(jeu);
 /**
     Paramètres:
         - jeu_: jeu
+        - bool: pointeur vers un booléen qui sera mis à true si tout s'est bien passé
 
     Retourne:
         - true si quand on place les pièces, elles ne se chevauchent pas et ne sortent pas du jeu
@@ -126,7 +130,7 @@ bool est_resolu(jeu);
     Complexité: O(nombre de piece * nombre de case par piece)
     // TODO: A améliorer si possible
 */
-bool est_valide_jeu(jeu);
+bool est_valide_jeu(jeu, bool*);
 
 /**
     Paramètres:

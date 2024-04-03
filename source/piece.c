@@ -20,8 +20,19 @@ bool est_valide(position p, int taille) {
 
 piece* creer_piece (int taille, position* positions_rel, bool bougeable) {
     piece* p = malloc(sizeof(piece));
+
+    if (p == NULL) {  // Si l'allocation a échoué on retourne NULL
+        return NULL;
+    }
+
     p->taille = taille;
     p->positions_rel = malloc(taille * sizeof(position));
+
+    if (p->positions_rel == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        free(p);
+        return NULL;
+    }
+
     for (int i = 0; i < taille; i++) {
         p->positions_rel[i] = positions_rel[i];
     }
@@ -32,8 +43,19 @@ piece* creer_piece (int taille, position* positions_rel, bool bougeable) {
 
 piece* rotation_piece(piece* p, int angle) {
     piece* p_rot = malloc(sizeof(piece));
+
+    if (p_rot == NULL) {  // Si l'allocation a échoué on retourne NULL
+        return NULL;
+    }
+
     p_rot->taille = p->taille;
     p_rot->positions_rel = malloc(p->taille * sizeof(position));
+
+    if (p_rot->positions_rel == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        free(p_rot);
+        return NULL;
+    }
+
     for (int i = 0; i < p->taille; i++) {
         p_rot->positions_rel[i].i = p->positions_rel[i].i;
         p_rot->positions_rel[i].j = p->positions_rel[i].j;
@@ -59,12 +81,20 @@ void free_piece (piece* p) {
 
 piece* copie_piece(piece* p) {
     piece* copie = malloc(sizeof(piece));
-    assert(copie != NULL);
+
+    if (copie == NULL) {  // Si l'allocation a échoué on retourne NULL
+        return NULL;
+    }
 
     copie->id = p->id;
     copie->taille = p->taille;
     copie->positions_rel = malloc(sizeof(position) * p->taille);
-    assert(copie->positions_rel != NULL);
+    
+    if (copie->positions_rel == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        free(copie);
+        return NULL;
+    }
+
     copie->pos = p->pos;
     copie->bougeable = p->bougeable;
 

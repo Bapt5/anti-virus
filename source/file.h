@@ -12,7 +12,7 @@ typedef struct file_s file;
 
 file creer_file(void);
 bool est_vide_file(file);
-void enfiler(void*, file*);
+bool enfiler(void*, file*);  // true si l'ajout a réussi, false sinon
 void* defiler(file*);
 void free_file(file*, void (*)(void*));
 

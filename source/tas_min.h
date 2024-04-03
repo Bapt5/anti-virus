@@ -18,7 +18,7 @@ typedef struct tas_min_s tas_min;
 
 tas_min creer_tas_min(int);
 bool est_vide_tas_min(tas_min);
-void inserer_tas_min(void*, int, tas_min*);
+bool inserer_tas_min(void*, int, tas_min*);  // Retourne false si l'allocation a échoué
 void* extraire_min_tas_min(tas_min*);
 void free_tas_min(tas_min*, void (*)(void*));
 

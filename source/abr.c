@@ -8,9 +8,18 @@ int max (int a, int b) {
 }
 
 abr creer_abr() {
-    /* Creer une feuille d'un ABR */
+    /* Creer une feuille d'un ABR 
+    Retourne:
+        - un pointeur vers la feuille
+        - NULL si l'allocation a échoué
+    */
     
     abr a = malloc(sizeof(noeud));
+
+    if (a == NULL) {  // Si l'allocation a échoué on retourne NULL
+        return NULL;
+    }
+
     a->droite = NULL;
     a->gauche = NULL;
     a->hauteur = -1;
@@ -69,20 +78,34 @@ bool trouver_abr (abr a, unsigned long long val) {
     }
 }
 
-void ajouter_abr (abr* a_p, unsigned long long val) {
+bool ajouter_abr (abr* a_p, unsigned long long val) {
     abr a = *a_p;
 
     if (a->droite == NULL && a->gauche == NULL) {
         a->valeur = val;
         a->droite = creer_abr();
+
+        if (a->droite == NULL) {
+            return false;
+        }
+
         a->gauche = creer_abr();
+
+        if (a->gauche == NULL) {
+            return false;
+        }
+
         a->hauteur = 0;
 
     } else if (val < a->valeur) {
-        ajouter_abr(&(a->gauche), val);   
+        if (!ajouter_abr(&(a->gauche), val)) {
+            return false;
+        }
 
     } else if (a->valeur < val) {
-        ajouter_abr(&(a->droite), val);
+        if (!ajouter_abr(&(a->droite), val)) {
+            return false;
+        }
 
     }
 
@@ -93,6 +116,8 @@ void ajouter_abr (abr* a_p, unsigned long long val) {
         rotation_droite(a_p);
     }
     a->hauteur = max(a->gauche->hauteur, a->droite->hauteur) + 1;
+
+    return true;
 }
 
 // equilibrage : https://stephane.glondu.net/projets/tipe/transparents.pdf

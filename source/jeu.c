@@ -40,14 +40,25 @@ bool est_vide_case (jeu jeu_, int** grille, position p) {
 
 int** construire_grille(jeu jeu_) {
     int** grille = malloc((jeu_.taille) * sizeof(int*));
-    assert(grille != NULL);
+    
+    if (grille == NULL) {  // Si l'allocation a échoué on retourne NULL
+        return NULL;
+    }
 
     // on créé la grille
     for (int i = 0; i < jeu_.taille; i += 1){
         int l_ligne = taille_ligne(jeu_, i);
 
         grille[i] = malloc(jeu_.taille * sizeof(int));
-        assert(grille[i] != NULL);
+        
+        if (grille[i] == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+            for (int j = 0; j < i; j += 1) {
+                free(grille[j]);
+            }
+
+            free(grille);
+            return NULL;
+        }
 
         for (int j = 0; j < jeu_.taille; j += 1) {
             if (j < (jeu_.taille - l_ligne)/2 || j >= (jeu_.taille + l_ligne)/2) {
@@ -82,9 +93,15 @@ void free_grille(jeu jeu_, int** grille) {
     free(grille);
 }
 
-bool est_valide_jeu(jeu jeu_) {
+bool est_valide_jeu(jeu jeu_, bool* succes) {
+    *succes = true;
+    
     int* grille = calloc(jeu_.taille*jeu_.taille, sizeof(int));
-    assert(grille != NULL);
+    
+    if (grille == NULL) {  // Si l'allocation a échoué on retourne false
+        *succes = false;
+        return false;
+    }
 
     // on place les pièces
     for (int k = 0; k < jeu_.nb_pieces; k += 1) {
@@ -135,12 +152,39 @@ jeu* creer_jeu(char* filename) {
     // 1e position: position de la pièce de base
     // positions suivantes: position relative des autres cases
     position** positions_pieces = malloc(nb_pieces * sizeof(position*));
+
+    if (positions_pieces == NULL) {  // Si l'allocation a échoué on retourne NULL
+        fclose(fichier);
+        return NULL;
+    }
+
     for (int i = 0; i < nb_pieces; i += 1) {
         positions_pieces[i] = malloc(nb_cases * sizeof(position));
+
+        if (positions_pieces[i] == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+            for (int j = 0; j < i; j += 1) {
+                free(positions_pieces[j]);
+            }
+
+            free(positions_pieces);
+            fclose(fichier);
+            return NULL;
+        }
     }
     
     // nombre de cases occupées par chaque pièce
     int* nb_cases_piece = malloc(nb_pieces * sizeof(int));
+
+    if (nb_cases_piece == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        for (int i = 0; i < nb_pieces; i += 1) {
+            free(positions_pieces[i]);
+        }
+
+        free(positions_pieces);
+        fclose(fichier);
+        return NULL;
+    }
+
     for (int i = 0; i < nb_pieces; i += 1) {
         nb_cases_piece[i] = 0;
     }
@@ -175,17 +219,77 @@ jeu* creer_jeu(char* filename) {
 
     // on créé les pièces
     piece** pieces = malloc(nb_pieces * sizeof(piece));
+
+    if (pieces == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        for (int i = 0; i < nb_pieces; i += 1) {
+            free(positions_pieces[i]);
+        }
+
+        free(positions_pieces);
+        free(nb_cases_piece);
+        fclose(fichier);
+        return NULL;
+    }
+
     int* id_pieces = malloc(nb_pieces * sizeof(int));
+
+    if (id_pieces == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        for (int i = 0; i < nb_pieces; i += 1) {
+            free(positions_pieces[i]);
+        }
+
+        free(positions_pieces);
+        free(nb_cases_piece);
+        free(pieces);
+        fclose(fichier);
+        return NULL;
+    }
+
     for (int i = 0; i < nb_pieces; i += 1) {
         position pos = positions_pieces[i][0];
         position* positions_rel = malloc(nb_cases_piece[i] * sizeof(position));
+
+        if (positions_rel == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+            for (int j = 0; j < nb_pieces; j += 1) {
+                free(positions_pieces[j]);
+            }
+
+            free(positions_pieces);
+            free(nb_cases_piece);
+            for (int j = 0; j < i; j += 1) {
+                free_piece(pieces[j]);
+            }
+
+            free(pieces);
+            free(id_pieces);
+            fclose(fichier);
+            return NULL;
+        }
+
         positions_rel[0] = (position){.i = 0, .j = 0};
         for (int j = 1; j < nb_cases_piece[i]; j += 1) {
             positions_rel[j] = positions_pieces[i][j];
         }
 
         pieces[i] = malloc(sizeof(piece));
-        assert(pieces[i] != NULL);
+
+        if (pieces[i] == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+            for (int j = 0; j < nb_pieces; j += 1) {
+                free(positions_pieces[j]);
+            }
+
+            free(positions_pieces);
+            free(nb_cases_piece);
+            for (int j = 0; j < i; j += 1) {
+                free_piece(pieces[j]);
+            }
+
+            free(pieces);
+            free(id_pieces);
+            free(positions_rel);
+            fclose(fichier);
+            return NULL;
+        }
 
         pieces[i]->id = i + 1;
         pieces[i]->taille = nb_cases_piece[i];
@@ -209,7 +313,16 @@ jeu* creer_jeu(char* filename) {
     fclose(fichier);
 
     jeu* jeu_ = malloc(sizeof(jeu));
-    assert(jeu_ != NULL);
+    
+    if (jeu_ == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        for (int i = 0; i < nb_pieces; i += 1) {
+            free_piece(pieces[i]);
+        }
+
+        free(pieces);
+        free(id_pieces);
+        return NULL;
+    }
 
     jeu_->taille = taille;
     jeu_->sortie = sortie;
@@ -232,6 +345,12 @@ void export_jeu(jeu jeu_, char* filename) {
 
     int** grille = construire_grille(jeu_);
 
+    if (grille == NULL) {  // Si l'allocation a échoué on arrête le programme
+        fclose(fichier);
+        printf("Impossible d'exporter le jeu (erreur d'allocation)\n");
+        return;
+    }
+
     for (int i = 0; i < jeu_.taille; i += 1) {
 
         for (int j = 0; j < jeu_.taille; j += 1) {
@@ -250,6 +369,11 @@ void export_jeu(jeu jeu_, char* filename) {
 
 void affiche_jeu(jeu jeu_) {
     int** grille = construire_grille(jeu_);
+
+    if (grille == NULL) {  // Si l'allocation a échoué on arrête le programme
+        printf("Impossible d'afficher le jeu (erreur d'allocation)\n");
+        return;
+    }
 
     for (int i = 0; i < jeu_.taille; i += 1) {
 
@@ -324,6 +448,8 @@ void envoyer_jeu_pieces(jeu jeu_, void* publisher) {
     // ...
     char* message = malloc(jeu_.taille * jeu_.nb_pieces * (20 + jeu_.taille * jeu_.taille) * sizeof(char)); 
 
+    assert(message != NULL);  // TODO: gérer l'exception
+
     // grille taille nombre de pièces
     sprintf(message, "grille %d %d\n", jeu_.taille, jeu_.nb_pieces);
 
@@ -387,7 +513,10 @@ void free_jeu(jeu* jeu_) {
 
 jeu* copie_jeu (jeu* jeu_) {
     jeu* jeu2 = malloc(sizeof(jeu));
-    assert(jeu2 != NULL);
+
+    if (jeu2 == NULL) {  // Si l'allocation a échoué on retourne NULL
+        return NULL;
+    }
 
     jeu2->taille = jeu_->taille;
     jeu2->sortie = jeu_->sortie;
@@ -395,17 +524,40 @@ jeu* copie_jeu (jeu* jeu_) {
     // on copie les pieces
     jeu2->nb_pieces = jeu_->nb_pieces;
     jeu2->pieces = malloc(jeu2->nb_pieces * sizeof(piece));
-    assert(jeu2->pieces != NULL);
+
+    if (jeu2->pieces == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        free(jeu2);
+        return NULL;
+    }
 
     for (int k = 0; k < jeu2->nb_pieces; k += 1) {
         jeu2->pieces[k] = copie_piece(jeu_->pieces[k]);
+
+        if (jeu2->pieces[k] == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+            for (int l = 0; l < k; l += 1) {
+                free_piece(jeu2->pieces[l]);
+            }
+
+            free(jeu2->pieces);
+            free(jeu2);
+            return NULL;
+        }
     }
 
     jeu2->piece_a_sortir = jeu_->piece_a_sortir;
 
     // on copie les id des pieces
     jeu2->id_pieces = malloc(jeu2->nb_pieces * sizeof(int));
-    assert(jeu2->id_pieces != NULL);
+    
+    if (jeu2->id_pieces == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        for (int k = 0; k < jeu2->nb_pieces; k += 1) {
+            free_piece(jeu2->pieces[k]);
+        }
+
+        free(jeu2->pieces);
+        free(jeu2);
+        return NULL;
+    }
     
     for (int k = 0; k < jeu2->nb_pieces; k += 1) {
         jeu2->id_pieces[k] = jeu_->id_pieces[k];

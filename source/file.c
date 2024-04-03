@@ -9,17 +9,19 @@ bool est_vide_file(file f){
 	return f.premier == NULL && f.dernier == NULL;
 }
 
-void enfiler(void* c, file* f){
+bool enfiler(void* c, file* f){
 	maillon* m = malloc(sizeof(maillon));
     
-    assert(m != NULL);
+    if (m == NULL) {
+		return false;
+	}
 
     m->valeur = c;
     m->suivant = f->dernier;
 
 	f->dernier = m;
     
-    return ;
+    return true;
 }
 
 void transfere (file* f) {

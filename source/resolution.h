@@ -19,6 +19,7 @@
 
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
+        - 1 si une allocation a échoué
 
     Méthode:
         - on utilise une brute force en essayant toutes les combinaisons de pièces
@@ -33,6 +34,7 @@ liste v0(jeu, int*);
     
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
+        - 1 si une allocation a échoué
 
     Méthode:
         - on utilise une brute force en essayant toutes les combinaisons de pièces
@@ -48,6 +50,7 @@ liste v1(jeu, int*);
 
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
+        - 1 si une allocation a échoué
 
     Méthode:
         - on utilise une brute force en essayant toutes les combinaisons de pièces
@@ -64,6 +67,7 @@ liste v2(jeu, int*);
 
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
+        - 1 si une allocation a échoué
 
     Méthode:
         - on choisi aléatoirement la pièce suivante à bouger
@@ -77,6 +81,7 @@ liste v3(jeu, int*);
 
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
+        - 1 si une allocation a échoué
 
     Méthode:
         - on utilise une file de priorité pour stocker les états du jeu 
@@ -91,6 +96,7 @@ liste v4(jeu, int*);
 
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
+        - 1 si une allocation a échoué
 
     Méthode:
         - on utilise un tas min pour stocker les états du jeu 
@@ -105,6 +111,7 @@ liste v5(jeu, int*);
 
     Retourne:
         - une liste de jeu* contenant les états du jeu menant à la solution
+        - 1 si une allocation a échoué
 
     Méthode:
         - on utilise un tas min pour stocker les états du jeu 

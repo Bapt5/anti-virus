@@ -95,6 +95,8 @@ Certaines idées d'heuristiques pour le problème du jeu Anti-virus peuvent incl
 
 https://medium.com/swlh/programming-puzzle-rush-hour-traffic-jam-3ee513e6c4ab
 
-### Monte-Carlos
+### Limites
+
+- Les grilles générés necessite parfois beaucoup de mémoire pour être résolus (OOM)
 
 ## IA classification : choix d'heuristique

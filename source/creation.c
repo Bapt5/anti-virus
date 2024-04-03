@@ -5,6 +5,10 @@ jeu* creation_jeu_random(int taille, int nb_pieces) {
     int nb_pieces_jeu = 7;
     piece** pieces = malloc(nb_pieces_jeu * sizeof(piece*));
 
+    if (pieces == NULL){  // Si l'allocation a échoué on retourne NULL
+        return NULL;
+    }
+
     pieces[0] = creer_piece(2, 
                     (position[]){
                         {.i = 0, .j = 0}, 
@@ -44,12 +48,53 @@ jeu* creation_jeu_random(int taille, int nb_pieces) {
                         {.i = 0, .j = 0}},
                     false);
 
+    if (pieces[0] == NULL || pieces[1] == NULL || pieces[2] == NULL || pieces[3] == NULL || pieces[4] == NULL || pieces[5] == NULL || pieces[6] == NULL){
+        for (int i = 0; i < nb_pieces_jeu; i++){
+            free_piece(pieces[i]);
+        }
+        free(pieces);
+
+        return NULL;
+    }
+
     jeu* j = malloc(sizeof(jeu));
+
+    if (j == NULL){  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        for (int i = 0; i < nb_pieces_jeu; i++){
+            free_piece(pieces[i]);
+        }
+        free(pieces);
+
+        return NULL;
+    }
+
     j->taille = taille;
     j->sortie = (position){.i = 0, .j = taille/2};
     j->nb_pieces = 1;
     j->pieces = malloc(nb_pieces * sizeof(piece*));
+
+    if (j->pieces == NULL){  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        for (int i = 0; i < nb_pieces_jeu; i++){
+            free_piece(pieces[i]);
+        }
+        free(pieces);
+        free(j);
+
+        return NULL;
+    }
+
     j->id_pieces = malloc(nb_pieces * sizeof(int));
+
+    if (j->id_pieces == NULL){  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+        for (int i = 0; i < nb_pieces_jeu; i++){
+            free_piece(pieces[i]);
+        }
+        free(pieces);
+        free(j->pieces);
+        free(j);
+
+        return NULL;
+    }
 
     // initialisation de la piece sortir
     j->pieces[0] = creer_piece(2, 
@@ -67,16 +112,48 @@ jeu* creation_jeu_random(int taille, int nb_pieces) {
         j->id_pieces[i] = i;
         // j->pieces[i] = creation_piece_random(taille);
         j->pieces[i] = rotation_piece(pieces[rand()%nb_pieces_jeu], rand()%4);
+
+        if (j->pieces[i] == NULL){  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+            for (int i = 0; i < nb_pieces_jeu; i++){
+                free_piece(pieces[i]);
+            }
+            free(pieces);
+            for (int i = 0; i < j->nb_pieces; i++){
+                free_piece(j->pieces[i]);
+            }
+            free(j->pieces);
+            free(j->id_pieces);
+            free(j);
+
+            return NULL;
+        }
+
         j->pieces[i]->id = i + 1;
         j->pieces[i]->pos.i = rand()%taille;
         j->pieces[i]->pos.j = rand()%taille;
         j->nb_pieces++;
 
         // on verifie que le jeu est toujours valide
-        if (!est_valide_jeu(*j)){
+        bool succes = true;
+        if (!est_valide_jeu(*j, &succes)){
             free_piece(j->pieces[i]);
             j->nb_pieces--;
             i--;
+        }
+
+        if (!succes){  // Si l'allocation a échoué on libère la mémoire déjà allouée et on retourne NULL
+            for (int i = 0; i < nb_pieces_jeu; i++){
+                free_piece(pieces[i]);
+            }
+            free(pieces);
+            for (int i = 0; i < j->nb_pieces; i++){
+                free_piece(j->pieces[i]);
+            }
+            free(j->pieces);
+            free(j->id_pieces);
+            free(j);
+
+            return NULL;
         }
     }
 
@@ -96,6 +173,7 @@ liste file_to_liste (file f) {
         free_liste(deplacement_l, NULL);
 
         l = ajouter_tete_liste(deplacement, l);
+        assert(l != NULL);
     }
     return l;
 }
@@ -105,10 +183,20 @@ jeu* melanger_jeu(jeu* jeu_, int nb_coups, int timeout) {
     int fail = 0;
     
     jeu* j = copie_jeu(jeu_);
+
     abr vus = creer_abr();
 
+    if (j == NULL || vus == NULL) {
+        return NULL;
+    }
+
     unsigned long long hash = hash_jeu(*j);
-    ajouter_abr(&vus, hash);
+    if(!ajouter_abr(&vus, hash)){
+        free_jeu(j);
+        free_abr(vus);
+
+        return NULL;
+    }
 
     for (int i = 0; i < nb_coups; i++) {
         if (time(NULL) - start > timeout) {
@@ -129,7 +217,12 @@ jeu* melanger_jeu(jeu* jeu_, int nb_coups, int timeout) {
         }
 
         file f = creer_file();
-        position_accessible(*j, 1, (int[]){id_piece}, &f, enfiler, creer_liste());
+        if(!position_accessible(*j, 1, (int[]){id_piece}, &f, enfiler, creer_liste())){
+            free_file(&f, free_liste);
+            i--;
+            fail++;
+            continue;
+        }
 
         liste deplacements_possibles = file_to_liste(f);
 
@@ -155,9 +248,22 @@ jeu* melanger_jeu(jeu* jeu_, int nb_coups, int timeout) {
         
         free_jeu(j);
         j = copie_jeu(deplacement);
+
+        if (j == NULL) {
+            free_liste(deplacements_possibles, free_jeu);
+            free_abr(vus);
+
+            return NULL;
+        }
+
         fail = 0;
 
-        ajouter_abr(&vus, hash_deplacement);
+        if (!ajouter_abr(&vus, hash_deplacement)) {
+            free_liste(deplacements_possibles, free_jeu);
+            free_abr(vus);
+
+            return NULL;
+        }
         free_liste(deplacements_possibles, free_jeu);
     }
 

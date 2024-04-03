@@ -9,6 +9,13 @@ void echange(tas_min_content* a, tas_min_content* b) {
 tas_min creer_tas_min(int capacite) {
     tas_min tas;
     tas.tab = malloc(capacite * sizeof(tas_min_content));
+
+    if (tas.tab == NULL) {  // Si l'allocation a échoué on retourne un tas vide
+        tas.taille = 0;
+        tas.capacite = 0;
+        return tas;
+    }
+
     tas.taille = 0;
     tas.capacite = capacite;
 
@@ -19,10 +26,14 @@ bool est_vide_tas_min(tas_min tas) {
     return tas.taille == 0;
 }
 
-void inserer_tas_min(void* valeur, int priorite, tas_min* tas) {
+bool inserer_tas_min(void* valeur, int priorite, tas_min* tas) {
     if (tas->taille == tas->capacite) {
         tas->capacite *= 2;
         tas->tab = realloc(tas->tab, tas->capacite * sizeof(tas_min_content));
+
+        if (tas->tab == NULL) {  // Si l'allocation a échoué on retourne false
+            return false;
+        }
     }
 
     tas->tab[tas->taille].valeur = valeur;
@@ -37,6 +48,7 @@ void inserer_tas_min(void* valeur, int priorite, tas_min* tas) {
     }
 
     tas->taille++;
+    return true;
 }
 
 void* extraire_min_tas_min(tas_min* tas) {

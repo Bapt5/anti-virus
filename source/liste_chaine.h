@@ -31,7 +31,7 @@ liste creer_liste(void);
 /** fonction : ajouter_tete_liste
 	- entrée : une valeur (type int) "c" et une liste (type liste) "l"
 	- précondition : la valeur doit être un entier
-	- sortie : une nouvelle liste avec la valeur ajoutée en tête
+	- sortie : une nouvelle liste avec la valeur ajoutée en tête (NULL si échec d'allocation mémoire)
 	- postcondition : la liste "l" en paramètre n'a pas été modifiée
 */
 liste ajouter_tete_liste(void*, liste);
@@ -142,19 +142,23 @@ bool appartient_liste(void*, liste, bool (*)(void*, void*));
 
 /** fonction : inverser_liste
 	- entrée : une liste "l" (type liste) et une fonction de copie "copie_valeur" (type void* (*)(void*))
+	(copie_valeur doit renvoyer NULL si l'allocation a échoué)
+	un pointeur vers un booléen qui sera mis à true si tout s'est bien passé
 	- précondition :  rien
 	- sortie : nouvelle liste contenant les éléments de "l" dans l'ordre inverse
 	- postcondition : "l" non-modifiée
 */
-liste inverser_liste(liste l, void* (*copie_valeur)(void*));
+liste inverser_liste(liste l, void* (*copie_valeur)(void*), bool* succes);
 
 /** fonction : copie_liste
-	- entrée : une liste "l" (type liste) et une fonction de copie "copie_valeur" (type void* (*)(void*))
+	- entrée : une liste "l" (type liste) et une fonction de copie "copie_valeur" (type void* (*)(void*)) 
+	(copie_valeur doit renvoyer NULL si l'allocation a échoué)
+	un pointeur vers un booléen qui sera mis à true si tout s'est bien passé
 	- précondition :  rien
 	- sortie : nouvelle liste contenant les éléments de "l" copiés
 	- postcondition : "l" non-modifiée
 */
-liste copie_liste(liste l, void* (*copie_valeur)(void*));
+liste copie_liste(liste l, void* (*copie_valeur)(void*), bool* succes);
 
 /** fonction : i_ieme_element_liste
 	- entrée : une liste "l" (type liste) et un entier "i" positif
