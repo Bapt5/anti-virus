@@ -76,6 +76,33 @@ liste v3(jeu, int*);
 
 /*
     Paramètres:
+        - jeu_: le jeu sur lequel on va appliquer l'heuristique
+    Retournes:
+        - true si l'ajout a réussi, false sinon
+    
+    Retourne la distance entre la pièce à sortir et la sortie
+*/
+int heuristique1(jeu);
+
+/*
+    Paramètres:
+        - jeu_: le jeu sur lequel on va appliquer l'heuristique
+
+    Retourne le nombre de pièces bloquant la pièce à sortir
+    Si la fonction renvoie -1, cela signifie que l'ajout des voisins a échoué
+*/
+int heuristique2(jeu);
+
+/*
+    Paramètres:
+        - jeu_: le jeu sur lequel on va appliquer l'heuristique
+
+    Retourne le nombre de pièces sur le chemin de la pièce à sortir dans la dernière grille de path
+*/
+int heuristique3(jeu);
+
+/*
+    Paramètres:
         - jeu_: le jeu
         - nb_explo: un pointeur vers un entier dans lequel on va stocker le nombre d'explorations
 
