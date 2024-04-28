@@ -14,6 +14,6 @@ file creer_file(void);
 bool est_vide_file(file);
 bool enfiler(void*, file*);  // true si l'ajout a réussi, false sinon
 void* defiler(file*);
-void free_file(file*, void (*)(void*));
+void free_file(file*, fct_free);
 
 #endif

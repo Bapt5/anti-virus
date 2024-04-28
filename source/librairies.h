@@ -15,4 +15,6 @@
 // sleep
 #include "unistd.h"
 
+typedef void (*fct_free)(void*);
+
 #endif

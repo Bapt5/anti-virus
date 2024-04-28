@@ -69,7 +69,7 @@ liste queue_liste(liste);
 	- sortie : rien
 	- postcondition : tout l'espace autrefois occupé par "l" est libéré
 */
-void free_liste(liste, void (*)(void*));
+void free_liste(liste, fct_free);
 
 /** fonction : acceder_indice_liste
 	- entrée : une liste "l" (type liste), un "indice" (type int)

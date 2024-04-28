@@ -94,7 +94,7 @@ void* extraire_min_tas(tas* tas) {
     return min;
 }
 
-void free_tas(tas* tas, void (*free_valeur)(void*)) {
+void free_tas(tas* tas, fct_free free_valeur) {
     for (int i = 0; i < tas->taille; i++) {
         free_valeur(tas->tab[i].valeur);
     }

@@ -33,7 +33,7 @@ liste queue_liste(liste l){
 }
 
 
-void free_liste(liste l, void (*free_valeur)(void*)){
+void free_liste(liste l, fct_free free_valeur){
 	if (!est_vide_liste(l)){
 		free_liste(l->suivant, free_valeur);
 

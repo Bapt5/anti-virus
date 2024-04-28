@@ -64,7 +64,7 @@ void* extraire_min_tas(tas*);
     * @param tas: le tas à libérer.
     * @param f: la fonction de libération de la valeur.
 */
-void free_tas(tas*, void (*)(void*));
+void free_tas(tas*, fct_free);
 
 
 #endif

@@ -52,7 +52,7 @@ void* defiler(file* f){
 }
 
 
-void free_file(file* f, void (*free_valeur)(void*)){
+void free_file(file* f, fct_free free_valeur){
 	while (!est_vide_file(*f)){
 		if (free_valeur != NULL) {
 			free_valeur(defiler(f));
