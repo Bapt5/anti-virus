@@ -673,7 +673,7 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
     }
 
     while (!est_vide_tas(file_prio)) {
-        liste path = extraire_min_tas(&file_prio);
+        liste path = extraire_tas(&file_prio);
         jeu* jeu2 = tete_liste(path);
 
         unsigned long long hash = hash_jeu(*jeu2);
@@ -696,7 +696,7 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
             if (!succes) {
                 free_liste(path, free_jeu);
                 while (!est_vide_tas(file_prio)) {
-                    free_liste(extraire_min_tas(&file_prio), free_jeu);
+                    free_liste(extraire_tas(&file_prio), free_jeu);
                 }
 
                 free_liste(resultat, free_jeu);
@@ -717,7 +717,7 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
                     if (!position_accessible(*jeu2, 1, (int[]){id_piece}, &file_prio, partial, path)) {
                         free_liste(path, free_jeu);
                         while (!est_vide_tas(file_prio)) {
-                            free_liste(extraire_min_tas(&file_prio), free_jeu);
+                            free_liste(extraire_tas(&file_prio), free_jeu);
                         }
 
                         free_liste(resultat, free_jeu);
@@ -729,7 +729,7 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
                     if (!bouge_voisins(*jeu2, id_piece, &file_prio, partial, path)) {
                         free_liste(path, free_jeu);
                         while (!est_vide_tas(file_prio)) {
-                            free_liste(extraire_min_tas(&file_prio), free_jeu);
+                            free_liste(extraire_tas(&file_prio), free_jeu);
                         }
 
                         free_liste(resultat, free_jeu);
@@ -744,7 +744,7 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
             if (!ajouter_abr(&vus, hash)) {
                 free_liste(path, free_jeu);
                 while (!est_vide_tas(file_prio)) {
-                    free_liste(extraire_min_tas(&file_prio), free_jeu);
+                    free_liste(extraire_tas(&file_prio), free_jeu);
                 }
 
                 free_liste(resultat, free_jeu);
@@ -761,7 +761,7 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
 
     // on vide le tas
     while (!est_vide_tas(file_prio)) {
-        free_liste(extraire_min_tas(&file_prio), free_jeu);
+        free_liste(extraire_tas(&file_prio), free_jeu);
     }
     free_tas(&file_prio, free_liste);
 

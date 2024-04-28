@@ -56,7 +56,7 @@ bool inserer_tas(void*, int, tas*);
     *
     * @return: la valeur extraite.
 */
-void* extraire_min_tas(tas*);
+void* extraire_tas(tas*);
 
 /*
     * Libère la mémoire allouée pour un tas.

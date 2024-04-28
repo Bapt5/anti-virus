@@ -65,7 +65,7 @@ bool inserer_tas(void* valeur, int priorite, tas* tas) {
     return true;
 }
 
-void* extraire_min_tas(tas* tas) {
+void* extraire_tas(tas* tas) {
     if (est_vide_tas(*tas)) {
         return NULL;
     }
