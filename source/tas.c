@@ -1,14 +1,22 @@
-#include "tas_min.h"
+#include "tas.h"
 
-void echange(tas_min_content* a, tas_min_content* b) {
-    tas_min_content temp = *a;
+void echange(tas_content* a, tas_content* b) {
+    tas_content temp = *a;
     *a = *b;
     *b = temp;
 }
 
-tas_min creer_tas_min(int capacite) {
-    tas_min tas;
-    tas.tab = malloc(capacite * sizeof(tas_min_content));
+bool comparaison_min(int a, int b) {
+    return a < b;
+}
+
+bool comparaison_max(int a, int b) {
+    return a > b;
+}
+
+tas creer_tas(int capacite, bool min) {
+    tas tas;
+    tas.tab = malloc(capacite * sizeof(tas_content));
 
     if (tas.tab == NULL) {  // Si l'allocation a échoué on retourne un tas vide
         tas.taille = 0;
@@ -18,18 +26,24 @@ tas_min creer_tas_min(int capacite) {
 
     tas.taille = 0;
     tas.capacite = capacite;
+    
+    if (min) {
+        tas.comparaison = comparaison_min;
+    } else {
+        tas.comparaison = comparaison_max;
+    }
 
     return tas;
 }
 
-bool est_vide_tas_min(tas_min tas) {
+bool est_vide_tas(tas tas) {
     return tas.taille == 0;
 }
 
-bool inserer_tas_min(void* valeur, int priorite, tas_min* tas) {
+bool inserer_tas(void* valeur, int priorite, tas* tas) {
     if (tas->taille == tas->capacite) {
         tas->capacite *= 2;
-        tas->tab = realloc(tas->tab, tas->capacite * sizeof(tas_min_content));
+        tas->tab = realloc(tas->tab, tas->capacite * sizeof(tas_content));
 
         if (tas->tab == NULL) {  // Si l'allocation a échoué on retourne false
             return false;
@@ -40,7 +54,7 @@ bool inserer_tas_min(void* valeur, int priorite, tas_min* tas) {
     tas->tab[tas->taille].priorite = priorite;
 
     int i = tas->taille;
-    while (i > 0 && tas->tab[i].priorite < tas->tab[(i - 1) / 2].priorite) {
+    while (i > 0 && tas->comparaison(tas->tab[i].priorite, tas->tab[(i - 1) / 2].priorite)) {
         // Echange père et fils
         echange(&tas->tab[i], &tas->tab[(i - 1) / 2]);
 
@@ -51,8 +65,8 @@ bool inserer_tas_min(void* valeur, int priorite, tas_min* tas) {
     return true;
 }
 
-void* extraire_min_tas_min(tas_min* tas) {
-    if (est_vide_tas_min(*tas)) {
+void* extraire_min_tas(tas* tas) {
+    if (est_vide_tas(*tas)) {
         return NULL;
     }
 
@@ -63,12 +77,12 @@ void* extraire_min_tas_min(tas_min* tas) {
     int i = 0;
     while (2 * i + 1 < tas->taille) {
         int plus_petit_fils = 2 * i + 1;
-        if (2 * i + 2 < tas->taille && tas->tab[2 * i + 2].priorite < tas->tab[2 * i + 1].priorite) {
+        if (2 * i + 2 < tas->taille && tas->comparaison(tas->tab[2 * i + 2].priorite, tas->tab[2 * i + 1].priorite)) {
             plus_petit_fils = 2 * i + 2;
         }
 
         // si le pere est plus petit que le plus petit des fils, il est plus petit que tous les fils
-        if (tas->tab[i].priorite < tas->tab[plus_petit_fils].priorite) {
+        if (tas->comparaison(tas->tab[i].priorite, tas->tab[plus_petit_fils].priorite)) {
             break;
         }
 
@@ -80,7 +94,7 @@ void* extraire_min_tas_min(tas_min* tas) {
     return min;
 }
 
-void free_tas_min(tas_min* tas, void (*free_valeur)(void*)) {
+void free_tas(tas* tas, void (*free_valeur)(void*)) {
     for (int i = 0; i < tas->taille; i++) {
         free_valeur(tas->tab[i].valeur);
     }

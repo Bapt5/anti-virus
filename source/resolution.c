@@ -586,7 +586,7 @@ int heuristique3 (jeu jeu_) {
     return prio;
 }
 
-bool insere_heuristique_fil (liste path, tas_min* tas, int (*heuristique)(jeu)) {
+bool insere_heuristique_fil (liste path, tas* tas, int (*heuristique)(jeu)) {
     /*
     Paramètres:
         - path: le chemin menant à la grille
@@ -603,7 +603,7 @@ bool insere_heuristique_fil (liste path, tas_min* tas, int (*heuristique)(jeu)) 
         return false;
     }
 
-    if (!inserer_tas_min(path, prio, tas)) {
+    if (!inserer_tas(path, prio, tas)) {
         return false;
     }
     
@@ -633,9 +633,9 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
     }
 
     int capacite_tas = jeu_.nb_pieces * jeu_.nb_pieces * jeu_.taille * jeu_.taille;
-    tas_min tas = creer_tas_min(capacite_tas);
+    tas file_prio = creer_tas(capacite_tas, true);
 
-    if (tas.capacite == 0) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on arrête la fonction
+    if (file_prio.capacite == 0) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on arrête la fonction
         free_abr(vus);
         free_liste(resultat, free_jeu);
 
@@ -647,7 +647,7 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
     if (g_copie == NULL) {  // Si l'allocation a échoué on libère la mémoire déjà allouée et on arrête la fonction
         free_abr(vus);
         free_liste(resultat, free_jeu);
-        free_tas_min(&tas, free_liste);
+        free_tas(&file_prio, free_liste);
 
         return 1;
     }
@@ -658,22 +658,22 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
         free_jeu(g_copie);
         free_liste(resultat, free_jeu);
         free_abr(vus);
-        free_tas_min(&tas, free_liste);
+        free_tas(&file_prio, free_liste);
 
         return 1;
     }
 
-    if(!inserer_tas_min(path_i, 0, &tas)) {  // Si l'ajout a échoué on libère la mémoire déjà allouée et on arrête la fonction
+    if(!inserer_tas(path_i, 0, &file_prio)) {  // Si l'ajout a échoué on libère la mémoire déjà allouée et on arrête la fonction
         free_jeu(g_copie);
         free_liste(resultat, free_jeu);
         free_abr(vus);
-        free_tas_min(&tas, free_liste);
+        free_tas(&file_prio, free_liste);
 
         return 1;
     }
 
-    while (!est_vide_tas_min(tas)) {
-        liste path = extraire_min_tas_min(&tas);
+    while (!est_vide_tas(file_prio)) {
+        liste path = extraire_min_tas(&file_prio);
         jeu* jeu2 = tete_liste(path);
 
         unsigned long long hash = hash_jeu(*jeu2);
@@ -695,8 +695,8 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
 
             if (!succes) {
                 free_liste(path, free_jeu);
-                while (!est_vide_tas_min(tas)) {
-                    free_liste(extraire_min_tas_min(&tas), free_jeu);
+                while (!est_vide_tas(file_prio)) {
+                    free_liste(extraire_min_tas(&file_prio), free_jeu);
                 }
 
                 free_liste(resultat, free_jeu);
@@ -710,14 +710,14 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
         } else {
             for (int id_piece = 1; id_piece <= jeu2->nb_pieces; id_piece += 1) {
                 if (jeu2->pieces[jeu2->id_pieces[id_piece - 1]]->bougeable) {
-                    bool partial (liste path, tas_min* tas) {  // WARNING: fonction locale (possible erreur)
-                        return insere_heuristique_fil(path, tas, heuristique);
+                    bool partial (liste path, tas* t) {  // WARNING: fonction locale (possible erreur)
+                        return insere_heuristique_fil(path, t, heuristique);
                     }
 
-                    if (!position_accessible(*jeu2, 1, (int[]){id_piece}, &tas, partial, path)) {
+                    if (!position_accessible(*jeu2, 1, (int[]){id_piece}, &file_prio, partial, path)) {
                         free_liste(path, free_jeu);
-                        while (!est_vide_tas_min(tas)) {
-                            free_liste(extraire_min_tas_min(&tas), free_jeu);
+                        while (!est_vide_tas(file_prio)) {
+                            free_liste(extraire_min_tas(&file_prio), free_jeu);
                         }
 
                         free_liste(resultat, free_jeu);
@@ -726,10 +726,10 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
                         return 1;
                     }
 
-                    if (!bouge_voisins(*jeu2, id_piece, &tas, partial, path)) {
+                    if (!bouge_voisins(*jeu2, id_piece, &file_prio, partial, path)) {
                         free_liste(path, free_jeu);
-                        while (!est_vide_tas_min(tas)) {
-                            free_liste(extraire_min_tas_min(&tas), free_jeu);
+                        while (!est_vide_tas(file_prio)) {
+                            free_liste(extraire_min_tas(&file_prio), free_jeu);
                         }
 
                         free_liste(resultat, free_jeu);
@@ -743,8 +743,8 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
             // on marque comme vu cette grille
             if (!ajouter_abr(&vus, hash)) {
                 free_liste(path, free_jeu);
-                while (!est_vide_tas_min(tas)) {
-                    free_liste(extraire_min_tas_min(&tas), free_jeu);
+                while (!est_vide_tas(file_prio)) {
+                    free_liste(extraire_min_tas(&file_prio), free_jeu);
                 }
 
                 free_liste(resultat, free_jeu);
@@ -760,10 +760,10 @@ liste v_heuristique (jeu jeu_, int* nb_explo, int (*heuristique)(jeu)) {
     free_abr(vus);
 
     // on vide le tas
-    while (!est_vide_tas_min(tas)) {
-        free_liste(extraire_min_tas_min(&tas), free_jeu);
+    while (!est_vide_tas(file_prio)) {
+        free_liste(extraire_min_tas(&file_prio), free_jeu);
     }
-    free_tas_min(&tas, free_liste);
+    free_tas(&file_prio, free_liste);
 
     return resultat;
 }
