@@ -100,3 +100,5 @@ https://medium.com/swlh/programming-puzzle-rush-hour-traffic-jam-3ee513e6c4ab
 - Les grilles générés necessite parfois beaucoup de mémoire pour être résolus (OOM)
 
 ## IA classification : choix d'heuristique
+
+k plus proches voisins + arbre k dimensionnel

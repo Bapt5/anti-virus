@@ -58,3 +58,6 @@ data/*
 # instances
 instances/*
 !instances/livret
+
+# Modeles IA
+models/*

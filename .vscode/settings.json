@@ -8,6 +8,7 @@
         "unistd.h": "c",
         "librairies.h": "c",
         "liste_chaine.h": "c",
-        "creation.c": "c"
+        "creation.c": "c",
+        "string.h": "c"
     }
 }
