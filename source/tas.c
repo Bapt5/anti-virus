@@ -96,7 +96,9 @@ void* extraire_tas(tas* tas) {
 
 void free_tas(tas* tas, fct_free free_valeur) {
     for (int i = 0; i < tas->taille; i++) {
-        free_valeur(tas->tab[i].valeur);
+        if (free_valeur != NULL) {
+            free_valeur(tas->tab[i].valeur);
+        }
     }
 
     free(tas->tab);

@@ -62,7 +62,7 @@ void* extraire_tas(tas*);
     * Libère la mémoire allouée pour un tas.
     *
     * @param tas: le tas à libérer.
-    * @param f: la fonction de libération de la valeur.
+    * @param f: la fonction de libération de la valeur (si NULL la valeur n'est pas libérée).
 */
 void free_tas(tas*, fct_free);
 
