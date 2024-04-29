@@ -12,6 +12,8 @@
 
 #include <time.h>
 
+typedef liste (*fct_resolution)(jeu, int*);
+
 /**
     Paramètres:
         - jeu_: le jeu
